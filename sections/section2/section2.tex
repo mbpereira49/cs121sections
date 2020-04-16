@@ -1,0 +1,317 @@
+%!TEX program = xelatex
+
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{filecontents}
+\usepackage{graphicx}
+\usepackage{listings}
+
+\DeclareMathOperator*{\E}{\mathbb{E}}
+\let\Pr\relax
+\DeclareMathOperator*{\Pr}{\mathbb{P}}
+
+\newcommand{\eps}{\varepsilon}
+\newcommand{\inprod}[1]{\left\langle #1 \right\rangle}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\handout}[5]{
+  \noindent
+  \begin{center}
+  \framebox{
+    \vbox{
+      \hbox to 5.78in { {\bf CS 121: Introduction to Theoretical Computer Science } \hfill #2 }
+      \vspace{4mm}
+      \hbox to 5.78in { {\Large \hfill #5  \hfill} }
+      \vspace{2mm}
+      \hbox to 5.78in { {\em #3 \hfill #4} }
+    }
+  }
+  \end{center}
+  \vspace*{4mm}
+}
+
+\newcommand{\lecture}[4]{\handout{#1}{#2}{#3}{#4}{Section #1}}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem*{proposition}{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{postulate}[theorem]{Postulate}
+\theoremstyle{definition}
+\newtheorem{defn}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{problem}{Problem}
+
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+\newtheorem*{notation}{Notation}
+\newtheorem*{note}{Note}
+
+% \DeclareUnicodeCharacter{1F346}{\eggplant}
+
+\newcommand{\sub}{\operatorname{sub}}
+\newcommand{\quot}{\operatorname{quot}}
+\newcommand{\bw}{\bigwedge}
+\newcommand{\Avs}{\operatorname{Av}^{\operatorname{sign}}}
+\newcommand{\bad}{\operatorname{bad}}
+\newcommand{\sign}{\operatorname{sign}}
+\newcommand{\id}{\operatorname{id}}
+\newcommand{\defeq}{\vcentcolon=}
+\newcommand{\eqdef}{=\vcentcolon}
+%We can even define a new command for \newcommand!
+\newcommand{\nc}{\newcommand}
+\nc{\on}{\operatorname}
+\nc\renc{\renewcommand}
+\nc{\BR}{\mathbb R}
+\nc{\BG}{\mathbb G}
+\nc{\BP}{\mathbb P}
+\nc{\BC}{\mathbb C}
+\nc{\BQ}{\mathbb Q}
+\nc{\BF}{\mathbb F}
+\nc{\BZ}{\mathbb Z}
+\nc{\BN}{\mathbb N}
+\nc{\BS}{\mathbb S}
+\nc{\Hom}{\on{Hom}}
+\nc{\wt}{\widetilde}
+\nc{\vspan}{\on{span}}
+\nc{\ord}{\on{ord}}
+\nc{\im}{\on{im}}
+\nc{\Mat}{\on{Mat}}
+\nc{\can}{\on{can}}
+\nc{\coker}{\on{coker}}
+\nc{\ev}{\on{ev}}
+\nc{\Tr}{\on{Tr}}
+\nc{\End}{\on{End}}
+\nc{\swap}{\on{swap}}
+\nc{\Set}{\on{Set}}
+\nc{\bC}{{\mathbf C}}
+\nc{\bc}{{\mathbf c}}
+\nc{\bD}{{\mathbf D}}
+\nc{\bd}{{\mathbf d}}
+\nc{\bE}{{\mathbf E}}
+\nc{\be}{{\mathbf e}}
+\nc{\bF}{{\mathbf F}}
+\nc{\bff}{{\mathbf f}}
+\nc{\CE}{\mathcal E}
+\nc{\CD}{\mathcal D}
+\nc{\CH}{\mathcal H}
+\nc{\CY}{\mathcal Y}
+\renc{\mod}{\on{-mod}} %Careful - turn this off in a number theory setting
+\newcommand{\spec}{\text{spec}}
+\nc{\adj}{\on{adj}}
+\nc{\tensor}[3]{#1 \underset{#2}\otimes #3}
+\nc{\Nat}{\on{Nat}}
+\nc{\op}{\on{op}}
+\nc{\Funct}{\on{Funct}}
+\nc{\Ob}{\on{Ob}}
+\nc{\fR}{\mathfrak{R}}
+\nc{\Vect}{\on{Vect}}
+\nc{\ns}{\on{non-spec}}
+\nc{\ol}{\overline}
+\nc{\ul}{\underline}
+\nc{\univ}{\on{univ}}
+\nc{\Maps}{\on{Maps}}
+\nc{\bdd}{\on{bdd}}
+\nc{\cont}{\on{cont}}
+\nc{\Sym}{\on{Sym}}
+\nc{\vol}{\on{vol}}
+\nc{\supp}{\on{supp}}
+\nc{\Lie}{\on{Lie}}
+\nc{\master}{\on{master}}
+\nc{\pt}{\on{pt}}
+% \nc{\dim}{\on{dim}}
+
+\nc{\dy}{\on{dy}}
+
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+
+% 1-inch margins, from fullpage.sty by H.Partl, Version 2, Dec. 15, 1988.
+\topmargin 0pt
+\advance \topmargin by -\headheight
+\advance \topmargin by -\headsep
+\textheight 8.9in
+\oddsidemargin 0pt
+\evensidemargin \oddsidemargin
+\marginparwidth 0.5in
+\textwidth 6.5in
+
+\parindent 0in
+\parskip 1.5ex
+
+\usepackage{natbib}
+
+% Some Extras
+\usepackage{xcolor}
+\usepackage{verbatim}
+\renewcommand*{\proofname}{Solution}
+\definecolor{navy}{rgb}{0,0,0.5}
+\usepackage{etoolbox}
+\AtBeginEnvironment{proof}{\color{navy}}
+
+\begin{document}
+% Change these parameters accordingly!
+\nc{\sectionnumber}{2}
+\nc{\thedate}{September 2019}
+\nc{\tfnames}{Pranay Tankala, Laura Pierson}
+
+
+\lecture{\sectionnumber --- \thedate}{Fall 2019}{Prof.\ Boaz Barak}{\tfnames}
+
+\section{Universal NAND-CIRC Program}
+
+\subsection{Conceptual Overview}
+
+\begin{itemize}
+  
+\item Since each program (e.g. NAND-CIRC program) is finite, we can encode it in the same way we can encode inputs to it (as a sequence of 0s and 1s). Therefore we can treat representations of code (in the form of bit sequences) as input to code.
+
+\item Every finite function can be computed by some NAND-CIRC program.
+
+\item Since NAND-CIRC programs are finite (after fixing the size of inputs and outputs), so too is the function that executes a given input on a given NAND-CIRC program. Thus, this function can also be computed by some NAND-CIRC program.
+
+\end{itemize}
+
+\subsection{NAND-CIRC Program Representation}
+
+We will represent a NAND-CIRC program $P$ with $n$ inputs, $m$ outputs, $s$ lines, and $t$ distinct variables as the triple $(n,m,L)$ where $L$ is a list of $s$ triples of the form $(i,j,k)$ for $i,j,k \in [t]$.
+
+For every variable of $P$, we assign a number in $[t]$ as follows:
+\begin{itemize}
+\item For every $i\in [n]$, the variable \texttt{X[i]} is assigned the number $i$. \
+\item For every $j\in [m]$, the variable \texttt{Y[j]} is assigned the number $t-m+j$. \
+\item Every other variable is assigned a number in ${n,n+1,\ldots,t-m-1}$ in the order of which it appears.
+\end{itemize}
+Each triple $(i, j, k)$ represents a line \texttt{u = NAND(v, w)}, where $i, j, k$ are the numbers we assigned to the variables \texttt{u, v, w}, respectively.
+
+Moreover, one can show that if the list $L$ corresponds to an $s$-line NAND-CIRC program, then $L$ can be encoded as a binary string of length $S(s) = 3s\lceil \log(3s)\rceil$.
+
+
+\vspace{2cm}
+
+\subsection{Formal statement of universality}
+Let us define the function $EVAL_{s,n,m} : \{0,1\}^{S(s)+n} \rightarrow \{0,1\}^m$ as follows: if $p \in \{0,1\}^{S(s)}$ represents a size $s$ NAND-CIRC program $P$ with $n$ inputs and $m$ outputs, and if $x \in \{0,1\}^n$ is any string, then $EVAL_{s,n,m}(px)$ is the output of $P$ on input $x$.
+
+We have the following important theorem regarding the $EVAL_{s,n,m}$ function:
+
+\begin{theorem}[Efficient bounded universality of NAND-CIRC programs]
+For all $s,n,m \in \mathbb{N}$ with $s \ge m$, there exists a NAND-CIRC program of at most $O(s^2\log s)$ lines that computes $EVAL_{s,n,m}$.
+\end{theorem}
+
+\subsection{Counting Arguments}
+
+Our representation of NAND-CIRC programs as strings leads to two other important results:
+
+\begin{theorem}[Counting programs]
+For every $n,m,s$ with $n,m \le 3s$, $|SIZE_{n,m}(s)| \le 2^{O(s \log s)}$.
+\end{theorem}
+\begin{theorem}[Counting argument lower bound]
+There is a function $F : \{0,1\}^n \to \{0,1\}$ such that the shortest NAND-CIRC program to compute $F$ requires $2^n/(100n)$ lines.
+\end{theorem}
+
+\subsection{Practice Problem}
+
+\begin{problem}
+Let $p$ be a string representation of $$(3, 1, ((3, 0, 0), (4, 1, 1), (5, 2, 2), (6, 3, 4), (7, 6, 6), (8, 5, 7)))$$
+Compute $EVAL_{6, 3, 1}(p, (1, 0, 1))$.
+\end{problem}
+
+\vspace{4cm}
+
+\newpage
+\section{Programs with Loops}
+
+\subsection{Conceptual Overview}
+
+\begin{itemize}
+   
+\item A finite NAND-CIRC program can only compute a finite function. This is a significant drawback, since we would like a universal notion of computation to inputs of arbitrary length. The solution is to extend the NAND-CIRC language to handle inputs of every possible size, including inputs larger than the program itself. 
+\item A function is \textbf{computable} if there is a NAND-TM program that computes it.
+\item NAND-TM is a \textbf{uniform} model of computation, in contrast to NAND-CIRC, which is \textbf{non-uniform}. 
+\item $ \text{NAND-TM} = \text{NAND-CIRC} + \text{loops} + \text{arrays}$
+\item A \textbf{total} function is one that can evaluate the entire domain. A \textbf{partial} function only computes over some subset of the domain.
+\item NAND-TM, Turing machines, and essentially all programming languages have equivalent computational power.
+\end{itemize}
+
+\subsection{Turing Machines}
+The components of a Turing Machines are: 
+\begin{itemize}
+	\item $k$ states
+	\item A tape of infinite length
+	\item A head keeping track of current location on tape
+	\item Some alphabet $\Sigma$, which we will define in our explanation to be $\{0, 1, \triangleright, \oslash\}$
+\end{itemize}
+
+In addition, to fully define a Turing machine, we also need a function $M : [k] \times \Sigma \rightarrow   \Sigma \times [k] \times \{L, R\}$.
+
+A Turing machine computes a function $F : \{0,1\}^* \rightarrow \{0,1\}^*$ if when the Turing Machine runs on input $x$, the Turing machine halts with only $F(x)$ written on the tape. 
+
+The Turing Machine starts with only $x$ written on the tape and the head pointing to the first cell of the tape. At each step, the Turing Machine reads the value at the cell the head points to. This value, along with the current state $s \in [k]$ are inputs to the function $M$. M outputs a new state $s'$, a new value $v' \in \{0, 1\}$ and L or R. The Turing machine will then write $v'$ to the tape, remember the new state $s'$ and move the head left or right. When the Turing machine reaches state $s = k-1$, it halts, at which point $F(x)$ is written on the tape. 
+
+\subsection{NAND-TM Progamming Language}
+NAND-TM programs add the following features on top of NAND-CIRC:
+
+\begin{itemize}
+
+\item We add a special integer valued variable \texttt{i}
+
+\item We support arrays by allowing variable identifiers to have the form \texttt{Foo[i]}. \texttt{Foo} is an array of Boolean values, and \texttt{Foo[i]} is the value of this array at index equal to the current value of the variable \texttt{i}.
+
+\item Input \texttt{X} and output \texttt{Y} are now considered arrays with values of zeroes and ones. We also add two new arrays \texttt{X\_nonblank} and  \texttt{Y\_nonblank} to mark their length, where \texttt{X\_nonblank[i]}$=1$ iff \texttt{i} is smaller than the length of the input, and \texttt{Y\_nonblank[j]}$=1$ iff \texttt{j} is smaller than the length of the output.
+
+\item We add a special \texttt{MODANDJUMP} instruction in the last line that takes two boolean variables $a,b$ as input and does the following:
+
+\begin{itemize}
+    \item If at least one of $a$ or $b$ is 1, \texttt{MODANDJUMP} jumps to the first line of the program. If $a=b=1$ it increments \texttt{i} by 1, if $a=0,b=1$ it decrememts \texttt{i} by 1, and if $a=1,b=0$ it keeps \texttt{i} the same.
+    \item If $a=b=0$ then \texttt{MODANDJUMP}($a,b$) halts execution of the program.
+\end{itemize}
+
+\end{itemize}
+\subsubsection{Practice Problems}
+\begin{problem} What function does the following NAND-TM program compute?
+
+\begin{verbatim}
+temp_0 = NAND(X[0],X[0])
+Y_nonblank[0] = NAND(X[0],temp_0)
+temp_1 = NAND(X[i],X[i])
+temp_2 = NAND(Y[0],Y[0])
+Y[0] = NAND(temp_1,temp_2)
+MODANDJUMP(X_nonblank[i], X_nonblank[i])
+\end{verbatim}
+\end{problem}
+\vspace{1cm}
+
+\begin{problem}Write a NAND-TM program $P$ that computes that parity of the number of $1$s in a given string.
+\end{problem}
+\vspace{5cm}
+
+
+\newpage
+\subsection{NAND-TM Syntactic Sugar}
+Like for NAND-CIRC, we can add additional syntactic sugar to NAND-TM to make programs easier to read, e.g.:
+\begin{itemize}
+    \item Syntactic sugar from NAND-CIRC; \texttt{if/then} conditionals
+    \item Arrays with multiple indices
+    \item Other index variables besides \texttt{i}
+    \item The \texttt{GOTO} command that allows us to jump to a specific line of code instead of the start
+    \item Nested loops and other loops such as \texttt{while} and \texttt{for} loops
+\end{itemize}
+How would we go about implementing each of these things in NAND-TM?
+
+\subsection{NAND-TM Computation}
+Let $P$ be a NAND-TM program. For every input $x\in {0,1}^*$, we define the output of $P$ on input $x$ (denotes as $P(x)$) to be the result of the following process:
+
+\begin{itemize}
+\item Initialize the variables \texttt{X[i]}$=x_i$ and \texttt{X\_nonblank[i]}$=1$ for all $i\in [n]$ (where $n=|x|$). All other variables (including \texttt{i} and \texttt{loop}) default to $0$.
+
+\item Run the program line by line. At the end of the program, if \texttt{MODANDJUMP} has at least one input 1, then increment/decrement \texttt{i} according to the inputs of \texttt{MODANDJUMP} and go back to the first line.
+
+\item If \texttt{MODANDJUMP} has both inputs 0 at the end of the program, then we halt and ouptput \texttt{Y[}$0$\texttt{]} , $\ldots$, \texttt{Y[}$m-1$\texttt{]} where $m$ is the smallest integer such that \texttt{Y\_nonblank[}$m$\texttt{]}$=0$.
+\end{itemize}
+
+If the program does not halt on input $x$, then we say it has no output, and we denote this as $P(x) = \bot$.
+
+Let $F:\{0,1\}^* \rightarrow \{0,1\}^*$ be a function and let $P$ be a NAND-TM program. We say that \textbf{$P$ computes $F$} if for every $x\in \{0,1\}^*$, $P(x)=F(x)$. We say that a function $F$ is \textbf{NAND-TM computable} if there is a NAND-TM program that computes it.
+
+\end{document}

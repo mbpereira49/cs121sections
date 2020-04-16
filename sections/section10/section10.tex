@@ -1,0 +1,252 @@
+\documentclass[10pt]{article}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage[margin=0.75in]{geometry}
+\usepackage[basic]{complexity}
+\usepackage{algpseudocode}
+\newcommand{\handout}[5]{
+  \noindent
+  \begin{center}
+  \framebox{
+    \vbox{
+      \hbox to 5.78in { {\bf CS 121: Introduction to Theoretical Computer Science } \hfill #2 }
+      \vspace{4mm}
+      \hbox to 5.78in { {\Large \hfill #5  \hfill} }
+      \vspace{2mm}
+      \hbox to 5.78in { {\small\em #3 \hfill #4} }
+    }
+  }
+  \end{center}
+  \vspace*{4mm}
+}
+\usepackage{xcolor}
+
+
+\newcommand{\lecture}[4]{\handout{#1}{#2}{#3}{#4}{Section #10}}
+
+\newcommand{\Verify}{\mathit{Verify}}
+\newcommand{\NAND}{\mathit{NAND}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\pred}{\leq_\text{p}}
+\newcommand{\Line}{\vspace{.3cm}\hrule\vspace{.3cm}}
+\newcommand{\TSAT}{3\mathit{SAT}}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{postulate}[theorem]{Postulate}
+\theoremstyle{definition}
+\newtheorem{defn}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{exercise}{Exercise}
+\newtheorem*{solution}{Solution}
+
+\begin{document}
+% Change these parameters accordingly!
+\newcommand{\sectionnumber}{11}
+\newcommand{\thedate}{\today}
+\newcommand{\tfnames}{William Burke, Pratap Singh}
+\newcommand{\bin}{\{0,1\}}
+\lecture{\sectionnumber\ --- \thedate}{Fall 2019}{Prof. Boaz Barak, Prof. Madhu Sudan}{\tfnames}
+
+\section{Space complexity}
+
+So far in this course we've only classified functions by their time complexity.  But memory is another very important resource for computation, so we also want to study the space used by algorithms and programs.
+
+\subsection{Modeling space-limited computation}
+We want to model the amount of memory that is essential for a particular computation, but not worry about the space used to store the input and output.  (Intuitively, we want to measure the additional space associated with the computation).  To do this, we modify our models of computation such that memory usage is easily measured.  In this unit, our Turing machines have three tapes:
+\begin{itemize}
+ \item \textit{Input tape:} a read-only tape initialized with the input to the machine.  We can move both left and right.
+ \item \textit{Output tape:} a write-only tape on which we write the output of our machine.  For simplicity, assume we can only move right.
+ \item \textit{Work tape:} a read/write tape which we use for our "intermediate results".  The number of cells used on the work tape is the memory or space used by the machine.
+\end{itemize}
+We saw some examples of this in class: addition and multiplication of two $n$-bit integers is in $O(\log n)$ space, bubble sort is in $O(\log n)$ space while merge sort is in $O(n)$ space.  
+
+Two more important problems for this unit are $CIRC-EVAL$ and $PATH$.  $CIRC-EVAL$ is the problem of evaluating a circuit $C$ on input $x$, and takes space linear in the size of the circuit - in the worst case we need to store some information for every gate in the circuit.  $PATH(G,u,v)$ is the decision problem of finding whether a path exists from vertex $u$ to vertex $v$ in directed graph $G$.  Later, we will see the space complexity of $PATH$.
+
+Additionally, we showed in class that $SAT$, quantified $SAT$, and many two-player games like chess and Go are also solvable in $O(n)$ space.
+
+\subsection{Space classes}
+Similar to how we defined sets of functions $F : \{0,1\}^* \rightarrow \{0,1\}$ based on their time complexity, we can define sets of functions based on space complexity.  
+
+The class $SPACE(s(n))$ is the class of functions $F : \{0,1\}^* \rightarrow \{0,1\}$ that can be computed by a Turing machine using space $s(n)$, where $s$ is a nice function.  Note that this definition doesn't make any restriction on the amount of time taken by the Turing machine.
+
+Importantly, $REG \in SPACE(O(1))$, i.e.\ regular expression matching can be computed in constant space.
+
+We define several larger classes based on these $SPACE$ classes:
+\begin{itemize}
+    \item The class $\mathbf{L}$ is defined as $\mathbf{L} = \displaystyle \bigcup_{c \in \mathbb{N}} SPACE(c \log n)$, that is the class of problems that can be solved using space logarithmic in the size of the input.  We consider this class to be feasible.
+    \item The class $\mathbf{NL}$ relates to $\mathbf{L}$ in the same way that $\mathbf{NP}$ relates to $\mathbf{P}$.  In particular, for every function $F \in \mathbf{NL}$, there exists some function $V \in \mathbf{L}$ s.t.\ $F(x) = 1 \iff V(x,w) = 1$ for some $w \in \{0,1\}^{a|x|^b}$.
+    \item The class $\mathbf{BPL}$ relates to $\mathbf{L}$ in the same way that $\mathbf{BPP}$ relates to $\mathbf{P}$.  For every function $F \in \mathbf{BPL}$, there exists some function $A \in \mathbf{L}$ s.t.\ $\Pr(F(x) = A(x,r)) \geq \frac{2}{3}$ where the probability is taken over all random strings $r$ whose length is polynomial in the length of $x$.
+    \item The class $\mathbf{PSPACE}$ is defined as $\mathbf{L} = \displaystyle \bigcup_{c \in \mathbb{N}} SPACE(n^c)$, that is the class of problems that can be solved using space polynomial in the size of the input.  In general, this class is not considered to be feasible, and in fact it contains NP-complete problems.  
+    \item We can define $\mathbf{NPSPACE},\mathbf{BPPSPACE}$ in the same way.
+\end{itemize}
+
+Recall the universal algorithm for simulating a Turing machine.  In previous chapters, we saw that the universal algorithm can simulate a machine with at most polynomial overhead in time complexity.  Similarly, it can be shown that there is a universal algorithm for simulating a Turing machine with logarithmic space overhead - that is, a Turing machine $U(M,x)$ which, on input a machine $M$ and input $x$, outputs the value computed by $M(x)$, and if $M$ has space complexity $s(|x|)$, $U(M,x)$ has space complexity $O(s(|x|) + \log |x|)$.
+
+Similar to the time hierarchy theorem, we also have a \textit{space hierarchy theorem}.  This states that for every pair of ``nice'' functions $s_1(n), s_2(n) : \mathbb{N}\rightarrow\mathbb{N}$ greater than $\log n$ such that $s_1(n) = o(s_2(n))$ (i.e.\ $s_2$ is asymptotically bigger than $s_1$), then $SPACE(s_1(n)) \subset SPACE(s_2(n))$ and $SPACE(s_1(n)) \neq SPACE(s_2(n))$. 
+
+In class, we discussed the theorem that $TIME(f(n)) \subseteq SPACE(f(n)) \subseteq TIME(2^{f(n)})$.  Intuitively, the first inclusion is because any TM that takes $f(n)$ time steps can only write to its work tape at most $f(n)$ times; the second inclusion follows because any TM that uses $f(n)$ memory can only write $2^{f(n)}$ unique configurations to that memory, and any program that writes the same state to memory multiple times can be sped up to write it only once.  This theorem also implies that $L \subseteq P \subseteq PSPACE \subseteq EXP$, based on the definitions of those classes.
+
+
+\subsection{Reductions and space completeness}
+Similarly to how we defined polynomial-time reductions, we have a notion of reduction in space complexity too.  This allows us to understand relationships between problems and define a notion of completeness for any of our classes - a function $F$ is complete in class $\mathbf{X}$, or $\mathbf{X}$-complete, if and only if $F$ is in $\mathbf{X}$ and every function in $\mathbf{X}$ can be reduced to $F$.
+
+Formally, we say that $F \leq_{s(n)} G$ if and only if there exists some algorithm $R$ that uses space $s(n)$ and $\forall x \in \{0,1\}^*$, $F(x) = G(R(x))$.  That is, an input to $F$ can be transformed to an input to $G$ in $s(n)$ space.  
+
+Now, supposing $G$ uses space $s_2(m)$ and the reduction algorithm $R$ uses space $s_1(n)$, what can we say about the space usage of $F$?  A na\"ive way to compute $F$ using $G$ would be to just compute $y = R(x)$ and then compute $G(y)$.  How much space does this use?  We need $|y| = m$ bits to write $y$, plus $s_1(n)$ bits for $R$ and $s_2(m)$ bits for $G$.  Since we can reuse the memory used for $R$ for $G$, the total is $m + \max(s_1(n), s_2(m))$.  For problems in $\mathbb{L}$, we might have something like $s_1(n) = 5 \log n$ and $s_2(m) = 10 \log m$, but then computing $F$ would take $O(m)$, not $O(\log m)$ bits.  Since we don't consider $O(m)$ to always be feasible, we want to do better than this.
+
+It turns out that it is possible to do better.  Instead of computing $y$ first, we start by simply computing $G$ using $s_2(m)$ space.  Whenever our algorithm for $G$ requires a bit $y_i$ from $y$, we suspend the computation of $G$, saving its state using $O(s_2(m))$ bits, then run $R$ using $s_1(n)$ additional memory.  Importantly, the only bit of $y$ that we actually write down is $y_i$, so we don't use $O(m)$ space in writing down $y$.  We then continue computing $G$ using that bit as normal.  This reduction allows us to compute $F$ using space $s_1(n) + s_2(m) + O(\log m)$, which will still be logarithmic if both $s_1$ and $s_2$ are logarithmic.  (However, note that this is a very time-inefficient algorithm.  In general, algorithms optimized for parsimonious memory usage may not be time-efficient, and vice versa.)
+
+Now, with this notion of reduction, we can define completeness such as $\mathbf{NL}$-completeness.  A problem is $\mathbf{NL}$-complete if and only if it is in $\mathbf{NL}$ and every problem in $\mathbf{NL}$ reduces to it in logarithmic space.  We claim that $PATH$ is $\mathbf{NL}$-complete.  It is easy to see that $PATH$ is in $\mathbf{NL}$ - we can verify whether a path is correct by simply walking along it from the source vertex and checking if we reach the destination vertex; this takes $O(\log n)$ bits to store the number of the current vertex.  The proof that $PATH$ is $\mathbf{NL}$-hard is omitted here for brevity, but the general idea is to encode the configurations of any Turing machine in $\mathbf{NL}$ as a graph, and then show that executing the Turing machine is equivalent to solving $PATH$ for some pair of vertices in that graph.  (See Arora and Barak, theorem 4.18, for the full proof).
+
+The most important proof for this unit is that $PATH \in \mathbf{L^2}$, i.e.\ the class of problems that can be solved in $O(\log^2 n)$ time.  This shows that $\mathbf{NL} = \mathbf{L^2}$. This result follows directly from a theorem that we discussed in class known as Savitch's theorem, which states that for any space class $NSPACE(f(n)) \subseteq SPACE(f(n)^2)$, but we will show this constructively. We define a recursive algorithm that tests graph G for connectivity between vertices $s,t \in V$ in at most k steps, STCON(s,t,k). PATH(s,t) reduces to calling STCON(s,t,n) where n is the total number of vertices in the graph. The algorithm runs as follows,
+
+\begin{defn}[\textsc{STCON}]
+  Let $G = \{V,E\}$ be the
+  directed or undirected graph provided to the algorithm and let $n$ be the
+  number of vertices in $V$. Let $s$ and $t$ be vertices. The algorithm returns true if there is a path of length at most k between the vertices.
+
+  \begin{algorithmic}
+    \If{$k == 0$ OR $k == 1$}
+    \State \Return $s == t$ OR ($s$ is a neighbor of $t$)
+    \EndIf
+    \If{$k > 1$}
+    \For{each vertex $u \in V, u \notin \{s,t\}$}
+    \If{$STCON(s,u,\left \lfloor{k/2}\right \rfloor )$ AND $STCON(u,t,\left \lceil{k/2}\right \rceil)$}
+    \State \Return TRUE
+    \Else
+    \EndIf
+    \EndFor
+    \EndIf
+    \State \Return \texttt{FALSE}
+  \end{algorithmic}
+
+  If we call STCON(s,t,n), we can see that this will return TRUE if there is a path between the vertices s and t. It will reach a recursion depth of at most log(n) and at each step, it will use at most log(n) memory. The total space complexity is then just $log^2(n)$
+\end{defn}
+
+
+\textbf{Exercise:} Prove that $NP \subseteq PSPACE$. Hint: We did this in lecture. Think about 3SAT.
+
+\textbf{Exercise:} Prove that $PSPACE = NPSPACE$. Hint: Use the verifier. Alternatively, apply Savitch's theorem.
+
+\textbf{Exercise:} Prove that $SPACE(f(n)) \subseteq TIME(2^{f(n)})$. Hint: Use the pigeonhole principle. Solution is in 1.2. Also in lecture.
+
+\textbf{Exercise:} A \textit{strongly connected graph} is a directed graph $G = (V,E)$ such that for every pair of vertices $u, v \in V$, there exists a path from $u$ to $v$ and from $v$ to $u$.  Let $STRONGLY-CONNECTED : \{0,1\}^* \rightarrow \{0,1\}$ be the function that, on input a graph $G = (V,E)$, returns 1 if and only if $G$ is strongly connected.  Prove that $STRONGLY-CONNECTED$ is $\mathbf{NL}$-complete. 
+
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% TAKEN FROM 2018 NOTES
+
+\section{Cryptography}
+
+
+\subsection{Definition of valid encryption scheme}
+
+
+Let $L:\N \rightarrow \N$ be some function. A pair of polynomial-time
+computable functions $(E,D)$ mapping strings to strings is a \emph{valid
+private key encryption scheme} (or \emph{encryption scheme} for short) with
+plaintext length $L(\cdot)$ if for every $k\in \{0,1\}^n$ and
+$x \in \{0,1\}^{L(n)}$, \begin{equation}D(k,E(k,x))=x \;. \label{eqvalidenc}\end{equation} We also require that our encryption schemes are \emph{length regular} in
+the sense that all ciphertexts corresponding to keys of the same length
+are of the same length: there is some function $C:\N \rightarrow \N$
+such that for every $k\in \{0,1\}^n$ and $x\in \{0,1\}^{L(n)}$,
+$|E(k,x)|=C(n)$.\footnote{The ``length regularity'' condition is added for technical
+convenience and is not at all important. You can ignore it in a
+first reading.}
+
+
+\subsection{Security}
+
+Let's go back to the definition of valid encryption scheme. Remark that the definition does not say anything about security. We could choose $E(k,x) = x$ and still be able to make the equation above work. Although this is definitely correct, it doesn't seem useful in practice because it's easy to decrypt. 
+
+
+\textbf{Exercise:} Think about what conditions you might want to put such that the encryption is secure.
+
+\textbf{Solutions:}
+
+A valid encryption scheme $(E,D)$ with length $L(\cdot)$ is \emph{perfectly
+secrect} if for every $n\in \N$ and plaintexts
+$x,x' \in \{0,1\}^{L(n)}$, the following two distributions $Y$ and $Y'$
+over $\{0,1\}^*$ are identical:
+
+
+
+\begin{itemize}
+\item 
+
+$Y$ is obtained by sampling a random $k\sim \{0,1\}^n$ and
+outputting $E_k(x)$.
+
+
+\item 
+
+$Y'$ is obtained by sampling a random $k\sim \{0,1\}^n$ and
+outputting $E_k(x')$.
+
+It is not clear from the definition that a perfect encryption system exists. However:
+
+\textbf{One Time Pad (Vernam 1917, Shannon 1949)}
+
+There is a perfectly secret valid encryption scheme $(E,D)$ with
+$L(n)=n$.
+
+
+
+\textbf{Proof idea}
+
+This idea is called the
+``Vernam Cipher'',
+exceedingly simple: to encrypt a message $x\in \{0,1\}^n$ with a key
+$k \in \{0,1\}^n$ we simply output $x \oplus k$ where $\oplus$ is the
+bitwise XOR operation that outputs the string corresponding to XORing
+each coordinate of $x$ and $k$.
+
+Try proving this as an \textbf{exercise}.
+
+\end{itemize}
+
+\subsection{Perfect secrecy requires long keys}
+
+The problem with the above encryption scheme is that to communicate $n$ bits, a key of length $n$ needs to be stored. We can actually prove the following result
+
+For every perfectly secret encryption scheme $(E,D)$ the length function
+$L$ satisfies $L(n) \leq n$.
+
+\textbf{Proof idea:} If the number of keys is smaller than the number of messages then the
+neighborhoods of all vertices in the corresponding graphs cannot be
+identical.
+
+\subsection{Computational secrecy}
+
+We defined computational secrecy as
+
+Let $(E,D)$ be a valid encryption scheme where for keys of length $n$,
+the plaintexts are of length $L(n)$ and the ciphertexts are of length
+$m(n)$. We say that $(E,D)$ is \emph{computationally secret} if for every
+polynomial $p:\N \rightarrow \N$, and large enough $n$, if $P$ is an
+$m(n)$-input and single output NAND program of at most $p(n)$ lines, and
+$x_0,x_1 \in \{0,1\}^{L(n)}$ then \begin{equation}\left| \mathbb E_{k \sim \{0,1\}^n} [P(E_k(x_0))] -   \mathbb E_{k \sim \{0,1\}^n} [P(E_k(x_1))] \right| < \tfrac{1}{p(n)} \label{eqindist}\end{equation}
+
+Remember from class we proved the following
+
+Suppose that the optimal PRG conjecture is true. Then for every constant
+$a\in \N$ there is a computationally secret encryption scheme $(E,D)$
+with plaintext length $L(n)$ at least $n^a$.
+
+\textbf{Proof idea}
+
+We simply
+take the one-time pad on $L$ bit plaintexts, but replace the key with
+$G(k)$ where $k$ is a string in $\{0,1\}^n$ and
+$G:\{0,1\}^n \rightarrow \{0,1\}^L$ is a pseudorandom generator.
+
+
+\end{document}

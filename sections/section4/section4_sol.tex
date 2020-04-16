@@ -1,0 +1,440 @@
+%!TEX program = xelatex
+
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,amsthm,listings}
+\usepackage{filecontents}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{comment, verbatim, xcolor}
+\usepackage{colortbl}
+
+\DeclareMathOperator*{\E}{\mathbb{E}}
+\let\Pr\relax
+\DeclareMathOperator*{\Pr}{\mathbb{P}}
+
+\newcommand{\eps}{\varepsilon}
+\newcommand{\inprod}[1]{\left\langle #1 \right\rangle}
+\newcommand{\R}{\mathbb{R}}
+
+\newcommand{\handout}[5]{
+  \noindent
+  \begin{center}
+  \framebox{
+    \vbox{
+      \hbox to 5.78in { {\bf CS 121: Introduction to Theoretical Computer Science } \hfill #2 }
+      \vspace{4mm}
+      \hbox to 5.78in { {\Large \hfill #5  \hfill} }
+      \vspace{2mm}
+      \hbox to 5.78in { {\em #3 \hfill #4} }
+    }
+  }
+  \end{center}
+  \vspace*{4mm}
+}
+
+\newcommand{\lecture}[4]{\handout{#1}{#2}{#3}{#4}{Section #1}}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem*{proposition}{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{postulate}[theorem]{Postulate}
+\theoremstyle{definition}
+\newtheorem{defn}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+\newtheorem*{notation}{Notation}
+\newtheorem*{note}{Note}
+
+% \DeclareUnicodeCharacter{1F346}{\eggplant}
+
+\newcommand{\sub}{\operatorname{sub}}
+\newcommand{\quot}{\operatorname{quot}}
+\newcommand{\bw}{\bigwedge}
+\newcommand{\Avs}{\operatorname{Av}^{\operatorname{sign}}}
+\newcommand{\bad}{\operatorname{bad}}
+\newcommand{\sign}{\operatorname{sign}}
+\newcommand{\id}{\operatorname{id}}
+\newcommand{\defeq}{\vcentcolon=}
+\newcommand{\eqdef}{=\vcentcolon}
+%We can even define a new command for \newcommand!
+\newcommand{\nc}{\newcommand}
+\nc{\on}{\operatorname}
+\nc\renc{\renewcommand}
+\nc{\BR}{\mathbb R}
+\nc{\BG}{\mathbb G}
+\nc{\BP}{\mathbb P}
+\nc{\BC}{\mathbb C}
+\nc{\BQ}{\mathbb Q}
+\nc{\BF}{\mathbb F}
+\nc{\BZ}{\mathbb Z}
+\nc{\BN}{\mathbb N}
+\nc{\BS}{\mathbb S}
+\nc{\Hom}{\on{Hom}}
+\nc{\wt}{\widetilde}
+\nc{\vspan}{\on{span}}
+\nc{\ord}{\on{ord}}
+\nc{\im}{\on{im}}
+\nc{\Mat}{\on{Mat}}
+\nc{\can}{\on{can}}
+\nc{\coker}{\on{coker}}
+\nc{\ev}{\on{ev}}
+\nc{\Tr}{\on{Tr}}
+\nc{\End}{\on{End}}
+\nc{\swap}{\on{swap}}
+\nc{\Set}{\on{Set}}
+\nc{\bC}{{\mathbf C}}
+\nc{\bc}{{\mathbf c}}
+\nc{\bD}{{\mathbf D}}
+\nc{\bd}{{\mathbf d}}
+\nc{\bE}{{\mathbf E}}
+\nc{\be}{{\mathbf e}}
+\nc{\bF}{{\mathbf F}}
+\nc{\bff}{{\mathbf f}}
+\nc{\CE}{\mathcal E}
+\nc{\CD}{\mathcal D}
+\nc{\CH}{\mathcal H}
+\nc{\CY}{\mathcal Y}
+\renc{\mod}{\on{-mod}} %Careful - turn this off in a number theory setting
+\newcommand{\spec}{\text{spec}}
+\nc{\adj}{\on{adj}}
+\nc{\tensor}[3]{#1 \underset{#2}\otimes #3}
+\nc{\floor}[1]{\lfloor #1 \rfloor}
+\nc{\Nat}{\on{Nat}}
+\nc{\op}{\on{op}}
+\nc{\Funct}{\on{Funct}}
+\nc{\Ob}{\on{Ob}}
+\nc{\fR}{\mathfrak{R}}
+\nc{\Vect}{\on{Vect}}
+\nc{\ns}{\on{non-spec}}
+\nc{\ol}{\overline}
+\nc{\ul}{\underline}
+\nc{\univ}{\on{univ}}
+\nc{\Maps}{\on{Maps}}
+\nc{\bdd}{\on{bdd}}
+\nc{\cont}{\on{cont}}
+\nc{\Sym}{\on{Sym}}
+\nc{\vol}{\on{vol}}
+\nc{\supp}{\on{supp}}
+\nc{\Lie}{\on{Lie}}
+\nc{\master}{\on{master}}
+\nc{\pt}{\on{pt}}
+% \nc{\dim}{\on{dim}}
+
+\nc{\dy}{\on{dy}}
+
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+
+% 1-inch margins, from fullpage.sty by H.Partl, Version 2, Dec. 15, 1988.
+\topmargin 0pt
+\advance \topmargin by -\headheight
+\advance \topmargin by -\headsep
+\textheight 8.9in
+\oddsidemargin 0pt
+\evensidemargin \oddsidemargin
+\marginparwidth 0.5in
+\textwidth 6.5in
+
+\parindent 0in
+\parskip 1.5ex
+
+\usepackage{natbib}
+%\renewcommand*\contentsname{Summary}
+
+\begin{document}
+% Change these parameters accordingly!
+\nc{\sectionnumber}{4 (with solutions)}
+\nc{\thedate}{October 2019}
+\nc{\tfnames}{}
+
+
+\lecture{\sectionnumber}{Fall 2019}{Prof.\ Boaz Barak}{}
+
+
+\bigskip
+\bigskip
+
+\hrule
+
+\section{Uncomputability}
+
+Before we dive into the main topic of this section, we review the concept of computability.
+
+\subsection{Recall: computability}
+
+So far, the functions $F$ that we considered in this class had $\{0, 1\}^n$ as its domain, where
+$n \in \mathbb{N}$. We've seen that $\emph{finite}$ functions
+
+\begin{equation*}
+    F:\{0, 1\}^n \rightarrow \{0, 1\}
+\end{equation*}
+
+are $\emph{computable}$ in the sense that we can always find a NAND-TM program $P_F$ such that
+$P_F(s) = F(s)$ for all $s \in \{0, 1\}^n$. 
+
+The question we ask is, $\emph{would this still be the case when the domain of the function is $\{0, 1\}^*$?}$
+Recall that $\{0, 1\}^*$ is simply the set that contains binary strings of all lengths.
+In other words, given any function $G$ with
+
+\begin{equation*}
+    G: \{0, 1\}^* \rightarrow \{0, 1\}
+\end{equation*}
+
+can we find a NAND-TM program $P_G$ with $P_G(s') = G(s')$ for all $s' \in \{0, 1 \}^*$?
+
+As it turns out, we $\emph{can't}$ for some functions.
+\bigskip
+
+\subsection{Theorem: existence of an uncomputable function}
+
+\begin{theorem}
+    There exists a function that is $\emph{not}$ computable by any NAND-TM program.
+\end{theorem}
+
+$\emph{Intuition.}$
+It is important to get the intuition here. There are infinitely many binary strings in $\{0, 1\}^*$, while there are
+finite number of strings in $\{ 0, 1\}^n$. And that's precisely what makes it impossible to compute some functions since
+NAND-TM programs are finite objects.
+
+\subsection{Proof:}
+
+\proof
+Consider the set of all NAND-TM programs $P: \{0, 1\}^* \rightarrow \{0, 1\}$ (takes any binary input string and outputs one bit). 
+Since $\emph{all}$ NAND-TM programs have an encoding, we can lexicographically order them
+(they are countably infinite). Suppose that $(P_0, P_1, P_2, \dots)$ is the lexicographic ordering of all NAND-TM programs.
+
+\begin{center}
+    \begin{tabular}{c|cccccccc}
+         & 0 & 1 & 10 & 11 & 100 & 101 & 110 & $\dots$ \\ 
+        \hline
+        $P_0$ & \cellcolor{green!20}0 & 1 & 1 & 0 & 1 & 1 & 1 & $\dots$ \\ 
+        $P_1$ & 1 & \cellcolor{green!20}1 & 1 & 1 & 1 & 1 & 1 & $\dots$ \\ 
+        $P_2$ & 1 & 1 & \cellcolor{green!20}0 & 1 & 1 & 1 & 1 & $\dots$ \\ 
+        $P_3$ & 1 & 1 & 1 & \cellcolor{green!20}doesn't halt & 1 & 1 & 1 & $\dots$ \\ 
+        $P_4$ & 1 & 1 & 1 & 1 & \cellcolor{green!20}1 & 1 & 1 & $\dots$ \\ 
+        $P_5$ & 0 & 0 & 1 & 1 & 1 & \cellcolor{green!20}1 & doesn't halt & $\dots$ \\ 
+        $P_6$ & 1 & 1 & 0 & 1 & 1 & 1 & \cellcolor{green!20}1 & $\dots$ \\ 
+        $\vdots$ & $\vdots$ & $\vdots$ & $\vdots$ & $\vdots$ & $\vdots$ & $\vdots$ & $\vdots$ & 
+    \end{tabular}
+\end{center}
+
+(Note: this table has been filled randomly just for the sake of illustrating the procedure.)
+
+The first column of the above table, as we discussed, is just an ordering of $\emph{all}$ NAND-TM programs, and
+the first row is the standard lexicogrphical ordering of all strings. Remember again that the first column contains
+$\emph{ALL}$ NAND-TM programs. So $\emph{if we can construct a function that disagrees}$
+$\emph{with all the programs}$ $\emph{(returns a different output for some
+string}$
+$\emph{from all of the programs in the
+first column)}$, $\emph{that proves the claim}$.
+
+Consider this function $F_{impossible}$ defined by flipping the bits in the green diagonal above.
+Note that we just consider ``doesn't halt'' to be the same as 0.
+
+\begin{center}
+    \begin{tabular}{c|cccccccc}
+        & 0 & 1 & 10 & 11 & 100 & 101 & 110 & $\dots$ \\ 
+        \hline
+        $F_{impossible}$ & \cellcolor{green!20}1 & \cellcolor{green!20}0 & \cellcolor{green!20}1 & \cellcolor{green!20}1
+        &\cellcolor{green!20}0 & \cellcolor{green!20}0 & \cellcolor{green!20}0 & $\dots$
+    \end{tabular}
+\end{center}
+
+Now the claim is that $F_{impossible}$ is different from all of the programs in the first column. $F_{impossible}$ is different from
+the function simulated by
+$P_0$, since they return different outputs for the string $0$. It is also different from $P_1$ since their outputs differ on $1$. 
+Similarly, $P_2$ on $10$, and $P_3$ on $11$. It is not too difficult to see that $P_n$ is going to disagree with $F_{impossible}$ on the
+binary representation of $n$.
+
+Therefore, $F_{impossible}$ is different from all of the programs in the first column of the table, i.e.
+no NAND-TM program can simulate $F_{impossible}$.
+
+\subsection{Exercise}
+Consider the set $P(\mathbb{N})$ of all subsets of $\mathbb{N}$. Show that there is no one-to-one and onto function between 
+$\mathbb{N}$ and $P(\mathbb{N})$. 
+
+\subsection{Solution}
+
+\emph{Solution.} 
+
+Suppose for contradiction that it is possible to find a one-to-one and onto map between $P(\mathbb{N})$ and $\mathbb{N}$. 
+Then it is possible to list all elements in $P(\mathbb{N})$ without missing out any (just list at the top the element that
+matches with $0 \in \mathbb{N}$ and the second row the one that matches 1, etc).
+
+We encode all elements of $P(\mathbb{N})$ as an infinite sequence of 1's and 0's.
+
+\begin{center}
+    \begin{tabular}{c|cccccccc}
+         & 0 & 1 & 2 & 3 & 4 & 5 & 6 & $\dots$ \\ 
+        \hline
+        $\{ \}$ & \cellcolor{green!20}0 & 0 & 0 & 0 & 0 & 0 & 0 & $\dots$ \\ 
+        $\{ 0 \}$ & 1 & \cellcolor{green!20}1 & 0 & 0 & 0 & 0 & 0 & $\dots$ \\ 
+        $\{ 1\}$ & 0 & 1 & \cellcolor{green!20}0 & 0 & 0 & 0 & 0 & $\dots$ \\ 
+        $\vdots$ & $\vdots$ & $\vdots$ & $\vdots$ & $\vdots$ & $\vdots$ & $\vdots$ & $\vdots$ & \\
+        $\{1, 2\}$ & 0 & 1 & 1 & 0 & \cellcolor{green!20}0 & 0 & 0 & $\dots$ \\ 
+        $\{1, 3\}$ & 0 & 1 & 0 & 1 & 0 & \cellcolor{green!20}0 & 0 & $\dots$ \\ 
+        $\vdots$ & $\vdots$ & $\vdots$ & $\vdots$ & $\vdots$ & $\vdots$ & $\vdots$ & $\vdots$ & 
+    \end{tabular}
+\end{center}
+
+There's no reason why the first element should be $\{ \}$, but just for concreteness we are putting it at the top. 
+Just like in the proof of the uncomputable function theorem, we consider the subset $S$ of $\mathbb{N}$ that corresponds to the
+sequence that you get by flipping all the green bits. Then $S$ is not in $P(S)$ and therefore the assumption that the listing is complete
+was false. Hence, it had to be the case that there is no one-to-one and onto function between $\mathbb{N}$ and $P(\mathbb{N})$.
+
+\section{Reduction}
+In the preceding section, we showed that there is some function from $\{0, 1\}^*$ to $\{0, 1\}$ that can't be simulated by
+any NAND-TM program, i.e. an uncomputable function. However, the uncomputable function that we constructed seemed rather contrived.
+After all, $F_{impossible}$ is constructed just so that it's different from all the NAND-TM programs in the list. In this section,
+we look at the technique called $\emph{reduction}$ which can be used to show the uncomputability of some less contrived functions.
+
+The big picture for reduction goes like this:
+\begin{itemize}
+    \item{
+            You have a problem $A$ that you $\emph{know}$ you $\emph{can't}$ solve.
+        }
+    \item{
+        And there's this other problem $B$ that you're wondering if you can solve.
+        }
+    \item{
+            You imagine (assume) that $B$ is solvable ($\emph{this is for the sake of contradiction}$).
+        }
+    \item{
+        As it turns out, if $B$ is solvable, then we can $\emph{use it}$ to solve $A$.
+        }
+    \item{
+        But since $A$ is just simply not solvable, something that we assumed must've been wrong.
+        }
+    \item{
+        So we deduce that $B$ can't be solvable (since that was the only assumption we made along the way).
+        }
+\end{itemize}
+
+Using reduction, we now prove the following.
+
+\subsection{Theorem: uncomputability of HALT}
+
+\begin{theorem}
+    Let $HALT: \{0, 1\}^* \rightarrow \{0, 1\}$ be the function such that
+    \begin{equation*}
+        HALT(P, x) = \begin{cases}
+            0 & \text{$P$ halts on input $x$} \\
+            1 & \text{otherwise}
+        \end{cases}
+    \end{equation*}
+
+    Then $HALT$ is $\emph{not}$ computable.
+\end{theorem}
+
+The roadmap from above would look like the below in this particular case:
+
+\begin{itemize}
+    \item{
+            We have a function $F_{impossible}$ that we know is not computable.
+        }
+    \item{
+            And we are wondering if $HALT$ is computable.
+        }
+    \item{
+            Assume for contradiction that $HALT$ is computable.
+        }
+    \item{
+            If $HALT$ is computable, then $F_{impossible}$ should also be computable.
+        }
+    \item{
+            But $F_{impossible}$ is not computable.
+        }
+    \item{
+            Hence, $HALT$ couldn't have been computable.
+        }
+\end{itemize}
+
+\subsection{Proof:}
+
+\proof The idea is pretty clear from the roadmap above (hopefully?), so we just prove the crux of the argument.
+
+\begin{center}
+     If $HALT$ is computable, then $F_{impossible}$ should also be computable.
+ \end{center}
+ 
+Assume that $HALT$ is computable. Then there is some NAND-TM program $P_{haltsolver}$ that computes $HALT$. In other words,
+
+   \begin{equation*}
+       P_{haltsolver}(P, x) = \begin{cases}
+            0 & \text{$P$ halts on input $x$} \\
+            1 & \text{otherwise}
+        \end{cases}
+    \end{equation*}
+
+    Using $P_{haltsolver}$ as a subroutine, we build $P_{impossiblesolver}$ as follows.
+
+    Given input $s \in \{0, 1\}^*$, 
+    \begin{enumerate}
+        \item{
+                Compute $n$, which is just the value of $s$ in decimal.
+            }
+        \item{
+                Using $n$, it constructs $P_n$, which can be done in finite time (run down the
+                lexicographically ordered list of all the strings until a valid description of $n^\text{th}$ NAND-TM
+                program comes up).
+            }
+        \item{
+                Run $P_{haltsolver}$ on $(P_n, s)$. If it tells us that $P_n$ halts on $s$, then we simply flip the output
+                of $P_n$ on $s$ after it halts.
+
+                If $P_{haltsolver}$ tells us that $P_n$ doesn't halt on $s$, return 1 (because we considered not halting to be
+                the same as 0 earlier).
+            }
+    \end{enumerate}
+
+    Now notice that the above builds exactly what we proved to be impossible in the previous theorem (i.e. $F_{impossible}$). Hence, something must've been wrong in the
+    assumptions that we've made along the way, and we only made one assumption: $HALT$ is computable. We conclude that
+    $HALT$ is $\emph{not}$ computable.
+
+    
+    \subsection{Exercise}
+    Let $E$ be defined as follows.
+
+   \begin{equation*}
+       E(P) = \begin{cases}
+           0 & \text{$P$ accepts any string from $\{0, 1\}^*$} \\
+            1 & \text{otherwise}
+        \end{cases}
+    \end{equation*}
+
+    Show that $E$ is $\emph{not}$ computable.
+    
+\subsection{Solution}
+    
+\emph{Solution} Suppose for contradiction that $E$ is computable. Then there is a NAND-TM program $P_E$ that computes $E$. Using
+    $P_E$ as a subroutine, we build $P_{HALT}$ that computes $HALT$ (which we know we shouldn't be able to).
+
+    Given $(P, x)$,
+    \begin{enumerate}
+        \item{
+            Construct a NAND-TM program $P'$ that works as follows: Given $x'$,
+            \begin{enumerate}
+                \item{
+                    Runs $P$ on $x$.
+                }
+            \item{
+                    returns 1 if $P$ halts.
+                }
+            \end{enumerate}
+            }
+        \item{
+            Run $P_E$ on $P'$. 
+            }
+    \end{enumerate}
+
+    Note that $P_E$ returns 1 if and only if $P$ halts on $x$. Hence, we've built a NAND-TM program that computes $P_{HALT}$ and that means
+    the assumption was false -- $E$ is $\emph{not}$ computable.
+
+\end{document}

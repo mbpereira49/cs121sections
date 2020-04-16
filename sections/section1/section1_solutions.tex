@@ -1,0 +1,223 @@
+%!TEX program = xelatex
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{filecontents}
+\usepackage{graphicx}
+
+\DeclareMathOperator*{\E}{\mathbb{E}}
+\let\Pr\relax
+\DeclareMathOperator*{\Pr}{\mathbb{P}}
+
+\newcommand{\eps}{\varepsilon}
+\newcommand{\inprod}[1]{\left\langle #1 \right\rangle}
+\newcommand{\R}{\mathbb{R}}
+
+\newcommand{\handout}[5]{
+  \noindent
+  \begin{center}
+  \framebox{
+    \vbox{
+      \hbox to 5.78in { {\bf CS 121: Introduction to Theoretical Computer Science } \hfill #2 }
+      \vspace{4mm}
+      \hbox to 5.78in { {\Large \hfill #5  \hfill} }
+      \vspace{2mm}
+      \hbox to 5.78in { {\em #3 \hfill #4} }
+    }
+  }
+  \end{center}
+  \vspace*{4mm}
+}
+
+\newcommand{\lecture}[4]{\handout{#1}{#2}{#3}{#4}{Section #1}}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem*{proposition}{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{postulate}[theorem]{Postulate}
+\theoremstyle{definition}
+\newtheorem{defn}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+\newtheorem*{notation}{Notation}
+\newtheorem*{note}{Note}
+
+% \DeclareUnicodeCharacter{1F346}{\eggplant}
+
+\newcommand{\sub}{\operatorname{sub}}
+\newcommand{\quot}{\operatorname{quot}}
+\newcommand{\bw}{\bigwedge}
+\newcommand{\Avs}{\operatorname{Av}^{\operatorname{sign}}}
+\newcommand{\bad}{\operatorname{bad}}
+\newcommand{\sign}{\operatorname{sign}}
+\newcommand{\id}{\operatorname{id}}
+\newcommand{\defeq}{\vcentcolon=}
+\newcommand{\eqdef}{=\vcentcolon}
+%We can even define a new command for \newcommand!
+\newcommand{\nc}{\newcommand}
+\nc{\on}{\operatorname}
+\nc\renc{\renewcommand}
+\nc{\BR}{\mathbb R}
+\nc{\BG}{\mathbb G}
+\nc{\BP}{\mathbb P}
+\nc{\BC}{\mathbb C}
+\nc{\BQ}{\mathbb Q}
+\nc{\BF}{\mathbb F}
+\nc{\BZ}{\mathbb Z}
+\nc{\BN}{\mathbb N}
+\nc{\BS}{\mathbb S}
+\nc{\Hom}{\on{Hom}}
+\nc{\wt}{\widetilde}
+\nc{\vspan}{\on{span}}
+\nc{\ord}{\on{ord}}
+\nc{\im}{\on{im}}
+\nc{\Mat}{\on{Mat}}
+\nc{\can}{\on{can}}
+\nc{\coker}{\on{coker}}
+\nc{\ev}{\on{ev}}
+\nc{\Tr}{\on{Tr}}
+\nc{\End}{\on{End}}
+\nc{\swap}{\on{swap}}
+\nc{\Set}{\on{Set}}
+\nc{\bC}{{\mathbf C}}
+\nc{\bc}{{\mathbf c}}
+\nc{\bD}{{\mathbf D}}
+\nc{\bd}{{\mathbf d}}
+\nc{\bE}{{\mathbf E}}
+\nc{\be}{{\mathbf e}}
+\nc{\bF}{{\mathbf F}}
+\nc{\bff}{{\mathbf f}}
+\nc{\CE}{\mathcal E}
+\nc{\CD}{\mathcal D}
+\nc{\CH}{\mathcal H}
+\nc{\CY}{\mathcal Y}
+\renc{\mod}{\on{-mod}} %Careful - turn this off in a number theory setting
+\newcommand{\spec}{\text{spec}}
+\nc{\adj}{\on{adj}}
+\nc{\tensor}[3]{#1 \underset{#2}\otimes #3}
+\nc{\Nat}{\on{Nat}}
+\nc{\op}{\on{op}}
+\nc{\Funct}{\on{Funct}}
+\nc{\Ob}{\on{Ob}}
+\nc{\fR}{\mathfrak{R}}
+\nc{\Vect}{\on{Vect}}
+\nc{\ns}{\on{non-spec}}
+\nc{\ol}{\overline}
+\nc{\ul}{\underline}
+\nc{\univ}{\on{univ}}
+\nc{\Maps}{\on{Maps}}
+\nc{\bdd}{\on{bdd}}
+\nc{\cont}{\on{cont}}
+\nc{\Sym}{\on{Sym}}
+\nc{\vol}{\on{vol}}
+\nc{\supp}{\on{supp}}
+\nc{\Lie}{\on{Lie}}
+\nc{\master}{\on{master}}
+\nc{\pt}{\on{pt}}
+% \nc{\dim}{\on{dim}}
+
+\nc{\dy}{\on{dy}}
+
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+
+% 1-inch margins, from fullpage.sty by H.Partl, Version 2, Dec. 15, 1988.
+\topmargin 0pt
+\advance \topmargin by -\headheight
+\advance \topmargin by -\headsep
+\textheight 8.9in
+\oddsidemargin 0pt
+\evensidemargin \oddsidemargin
+\marginparwidth 0.5in
+\textwidth 6.5in
+
+\parindent 0in
+\parskip 1.5ex
+
+\usepackage{natbib}
+
+\begin{document}
+% Change these parameters accordingly!
+\nc{\sectionnumber}{1}
+\nc{\thedate}{}
+\nc{\tfnames}{}
+
+
+\lecture{\sectionnumber}{Fall 2019}{Prof.\ Boaz Barak}{\tfnames}
+
+\section{Representation}
+
+\begin{enumerate}
+\tightlist
+\item Can we come up with a representation of the complex numbers? Why or why not? What if we had an exact representation of the reals? \\\\
+No, because we can surject complex numbers onto the reals. If we had an exact representation of the reals, we could certainly do it with the same trick as using the rationals to represent the real and complex part of the number, or the polar coordinates (you can do whatever parametrization you want)!
+\\
+\item Write down an encoding $E: \{0,1,2\}^* \to \{0,1\}^*$. Can you come up with a one-to-one function $S \to \{0,1,2\}^*$, where $S$ is the set of $n$-tuples of natural numbers? \\\\
+Encoding $\{0,1,2\}^* \to \{0,1\}^*$ can simply map $0$ to $00$, $1$ to $11$, and $2$ to $01$. 
+
+One-to-one function from $S$ to $\{0,1,2\}^*$ is just writing out the natural numbers in binary, then appending a $2$ between them.
+\\
+\item For each of the following sets $S$, determine if there exists an encoding $S \to \{0,1\}^*$:
+\begin{enumerate}
+    \item $S$ is the set of infinite integer sequences that are uniformly zero after some point
+    \item $S$ is the set of infinite integer sequences that are uniformly zero before some point
+\end{enumerate}
+\vspace{11pt}
+\begin{enumerate}
+\item Yes (this is equivalent to an encoding for the set of finite integer sequences)
+\item No (this is equivalent to an encoding for the set of infinite integer sequences)
+\end{enumerate}
+\end{enumerate}
+
+
+\section{Computability}
+
+\begin{enumerate}
+\tightlist
+\item Define CMP that on input $(a,b,c,d)$, CMP function outputs $1$ if the natural number represented by $(a,b)$ is greater than the natural number represented by $(d,e)$. Describe an AON-CIRC program computing the CMP function. \\\\
+We want to check if $2 a + b > 2 c + d$. Note that this is equivalent to $(a > b) \lor ((a = b) \land (b > d))$. For two bits $a, b$, we can compute $a > b$ with $\text{AND}(\text{XOR}(a,b), a)$ and we can compute $a = b$ with $\text{NOT}(\text{XOR}(a,b))$. Hence, we can write
+$$CMP(a,b,c,d) = \text{OR}(\text{AND}(\text{XOR}(a,c), a), \text{AND}(\text{NOT}(\text{XOR}(a,c)), \text{AND}(\text{XOR}(b,d), b)) $$
+Recall that we can compute $\text{XOR}(a,b)$ with $\text{AND}(\text{NOT}(\text{AND}(a,b), \text{OR}(a,b))$, so we have all the pieces to implement the relevant AON-CIRC program.
+\\
+\item The NOR operation to, on input $(a,b)$, output $1$ if $a=b=0$ and $0$ otherwise. Let NOR-CIRC be the programming
+language where we have just the NOR operation. Compare the power
+of AON-CIRC programs and NOR-CIRC programs (i.e. either show that there is some function that only one type of program can compute or if a function is computable by one type of program iff it is computable by the other).
+\\\\
+AON-CIRC and NOR-CIRC are equally powerful.
+
+\vspace{5pt}
+To show that AON-CIRC is as powerful as NOR-CIRC, we just need to show that we can compute NOR with AND, OR, and NOT. We can compute $\text{NOR}(a,b)$ with 
+$$\begin{aligned}
+\text{temp\_1} &= \text{OR}(\text{X}[0],\text{X}[1]) \\
+\text{Y}[0] &= \text{NOT}(\text{temp\_1}) \\
+\end{aligned}$$
+The idea is that once we have this, if function $f$ is computable by NOR-CIRC program $P$, we can replace every NOR operation with lines that execute the above combination of NOT and OR operations.
+
+\vspace{5pt}
+To show that NOR-CIRC is as powerful as AON-CIRC, we need to show that we can compute AND, OR, and NOT with NOR. We can compute $\text{NOT}(a)$ with 
+$$\begin{aligned}
+\text{Y}[0] &= \text{NOR}(\text{X}[0]) \\
+\end{aligned}$$
+$\text{OR}(a, b)$ with 
+$$\begin{aligned}
+\text{temp\_1} &= \text{NOR}(\text{X}[0],\text{X}[1]) \\
+\text{Y}[0] &= \text{NOR}(\text{temp\_1}, \text{temp\_1}) \\
+\end{aligned}$$
+and $\text{AND}(a, b)$ with 
+$$\begin{aligned}
+\text{temp\_1} &= \text{NOR}(\text{X}[0],\text{X}[0]) \\
+\text{temp\_1} &= \text{NOR}(\text{X}[1],\text{X}[1]) \\
+\text{Y}[0] &= \text{NOR}(\text{temp\_1}, \text{temp\_2}) \\
+\end{aligned}$$
+The idea is that once we have this, if function $f$ is computable by AON-CIRC program $P$, we can replace AND, OR, and NOT NOR operations with lines that execute the above combinations of NOR operations.
+
+\end{enumerate}
+
+
+
+
+\end{document}

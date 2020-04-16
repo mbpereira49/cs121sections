@@ -1,0 +1,397 @@
+\documentclass[11pt]{article}
+
+%% SOLUTIONS TOGGLE
+\newif\ifsolutions
+%%% Un-comment to generate solutions:
+% \solutionstrue
+%%%
+
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage[margin=0.75in]{geometry}
+\usepackage[basic]{complexity}
+\usepackage{algpseudocode}
+\newcommand{\handout}[5]{
+  \noindent
+  \begin{center}
+  \framebox{
+    \vbox{
+      \hbox to 5.78in { {\bf CS 121: Introduction to Theoretical Computer Science } \hfill #2 }
+      \vspace{4mm}
+      \hbox to 5.78in { {\Large \hfill #5  \hfill} }
+      \vspace{2mm}
+      \hbox to 5.78in { {\small\em #3 \hfill #4} }
+    }
+  }
+  \end{center}
+  \vspace*{4mm}
+}
+\usepackage{xcolor}
+
+
+\newcommand{\lecture}[4]{\handout{#1}{#2}{#3}{#4}{Section #1}}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{postulate}[theorem]{Postulate}
+\theoremstyle{definition}
+\newtheorem{defn}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{exercise}{Exercise}
+\newtheorem*{solution}{Solution}
+
+\begin{document}
+% Change these parameters accordingly!
+\newcommand{\sectionnumber}{9}
+\newcommand{\thedate}{November 9, 2017}
+\newcommand{\tfnames}{Pratap Singh, Prayaag Venkat}
+\lecture{\sectionnumber\ --- \thedate}{Fall 2019}{Prof. Boaz Barak}{\tfnames}
+
+
+\section{Probability Theory}
+In this section we will review the basic notion of probability theory that we will use.
+\begin{itemize}
+\item{The basic probabilistic experiment corresponds to tossing $n$ coins or choosing $x$ uniformly at random from $\{0,1\}^n$. }\\
+\item{Random variables assign a real number to every result of a coin toss. The expectation of a random variable is its average value (also called the \emph{mean}). There are several ``concentration'' results stating that (under certain conditions) the probability that a random variable deviates significantly from its expectation is small.}
+\item Throughout, we will study the running example of the random variable $Z = \sum_{i=1}^n Z_i$, where $Z_1, \ldots, Z_n$ are independent, unbiased bits. That is, each $Z_i$ takes the values $0,1$ with probability $\frac{1}{2}$ each. In short, $Z$ is a count of the number of heads after $n$ fair coin tosses.
+\end{itemize}
+
+\subsection{Random Coins}
+\begin{itemize}
+\item{Setting: toss $n$ random, unbiased and independent coins. }
+\item{Event: subset $A$ of $\{0,1\}^n$. Probability of $A $ is $ \mathbb{P}_{x \sim \{0,1\}^n}[A] = \frac{|A|}{2^n}$. }
+\end{itemize}
+
+\subsection{Random Variables}
+\begin{itemize}
+\item{Expectation of a random variable X is denoted by $\mathbb{E}[X]$, is the average value that this number takes, taken over all draws from the probabilistic experiment. 
+	\[\mathbb{E}[X] =  \sum_{x\in\{0,1\}^n} {2^{-n}} X(x)  \]}
+\item For the coin tossing example, 
+\[\mathbb{E}[Z] = \sum_{i=1}^n \mathbb{E}[Z_i] = \frac{n}{2} \]
+\end{itemize}
+
+\subsection{Correlations and Independence}
+\begin{itemize}
+\item Two events A and B are independent if the fact that A happened does not make B neither more not less likely to happen. Think about the experiment of tossing three random coins described in the lecture notes. The formal definition is that events A and B are independent if
+$\mathbb{P} [A\cap B] =  \mathbb{P} [A] \cdot \mathbb{P} [B]$.
+
+\item{Positively correlated: $\mathbb{P} [A\cap B] > \mathbb{P} [A] \cdot \mathbb{P} [B]$}
+\item{Negatively correlated: $\mathbb{P} [A\cap B] <  \mathbb{P} [A] \cdot \mathbb{P} [B]$}
+\end{itemize}
+
+
+\subsection{Concentration}
+In this section, we want to capture the following intuition mathematically: if I toss 100 fair coins, how likely is it that I see a number of heads between 40 and 60? Now, if I toss 1000 coins, how likely is it that I see a number of heads between 400 and 600?
+
+\begin{itemize}
+\item Much of probability theory is concerned with so called concentration or tail bounds, which are upper bounds on the probability that a random variable X deviates too much from its expectation. The simplest one of these is: 
+
+\begin{theorem}[Markov's Inequality]
+If $X$ is a non-negative random variable then $\mathbb{P} [X \geq k \mathbb{E} [X]] \leq 1/k$.
+\end{theorem}
+
+For the coin tossing example, we already calculated $\mathbb{E}[Z] = \frac{n}{2}$. Taking $k=1.1$, for example, Markov's Inequality tells us that $\mathbb{P} [Z \geq 0.55n] \leq 0.91$, which is a pretty weak statement. 
+
+\item
+A standard way to measure the deviation of a random variable from its expectation is using its standard deviation. For a random variable X, we define the variance of X as $Var[X] = \mathbb{E}[X - \mu]^2$ where $\mu = \mathbb{E} [X]$, i.e., the variance is the average square distance of X from its expectation. The standard deviation of X is defined as $\sigma[X] =  \sqrt{Var[X]} $. (This is well defined since the variance, being an average of a square, is always a non-negative number.)
+
+Using Chebychev's inequality we can control the probability that a random variable is too many standard deviations away from its expectation.
+
+
+\begin{theorem}[Chebyshev's Inequality]
+ Suppose $\mu = \mathbb{E} [X] $ and $\sigma ^2 = Var[X]$. Then for every $k>0$, $\mathbb{P} [|X-\mu | \geq k\sigma ] \leq 1/k^2$.
+\end{theorem}
+
+While Chebyshev's Inequality is more powerful, we need to calculated the variance to use it. For the coin tossing example, $Var[Z] = \sum_{i=1}^n Var[Z_i] = n/4$ (justify why this is true!). Chebyshev's Inequality then tells us for $k=1.1$:
+\[
+\mathbb{P} [|Z - \frac{n}{2} | \geq .78 \sqrt{n} ] \leq .83,
+\]
+which is definitely better than what Markov gave, but still not what we should expect.
+
+\item
+The following extremely useful theorem shows that such exponential decay occurs every time we have a sum of independent and bounded variables. This theorem is known under many names in different communities, though it is mostly called the Chernoff bound in the computer science literature.
+
+
+\begin{theorem}[Chernoff Bound]
+ If $X_0,..,X_{n-1}$ are i.i.d random variables such that $X_i \in [0,1]$ and $\mathbb{E} [X_i] = p$ for every $i$, then for every $\epsilon > 0$: 
+\[\mathbb{P} [|\sum_{i=0}^{n-1} X_i -pn | > \epsilon n] \leq 2 \exp(- \epsilon^2 n/2)\] 
+\end{theorem}
+
+Now, applying this to the coin tossing example, with $p = \frac{1}{2}$ and $\epsilon = .1$, we get
+\[
+\mathbb{P} [|Z -\frac{n}{2} | > .1 n] \leq 2 \exp(- .005n).
+\]
+This is much stronger; it guarantees that the probability of deviations from the mean beyond $.1n$ are \emph{exponentially small}. Compare this with Markov and Chebyshev, which only give \emph{polynomial} decay. This is the strongest of the three bounds, but also requires the most assumptions.
+
+\end{itemize}
+
+\section{Probability Problems}
+
+\subsection{Random Variable Example}
+
+
+Give an example of random variables $X, Y : \{0, 1\} \rightarrow R$ such that $\mathbb{E} [XY] \neq \mathbb{E} [X] \mathbb{E} [Y]$. \\
+
+\ifsolutions
+\color{blue}
+\begin{solution}
+This is just any case where two variables are not independent. \\
+
+For example, take $X = Y = x_0$, where $x_0$ is the result of the coin flip. 
+
+Then, we get that $\mathbb{E} [f(x)] = \sum_k \mathbb{P} (X = k ) \cdot f(k)$. \\
+
+Then we can calculate the left hand side of the equation, $\mathbb{E} [X^2] = (1/2)\cdot (0^2) + (1/2) (1^2) = 1/2$. \\
+
+Now to calculate the right hand side of the equation, $\mathbb{E} [X] \cdot \mathbb{E} [X] = 1/2 \cdot 1/2 = 1/4$. \\
+
+Therefore, $\mathbb{E} [XY] \neq \mathbb{E} [X] \mathbb{E} [Y]$, where X = Y.
+\end{solution}
+\color{black}
+\else
+\vspace{0.75in}
+\fi
+
+\subsection{Example 19.8}
+Prove that $\mathbb{P}_{x \sim \{0,1\}^n} [\sum x_i = k] = {{n}\choose{k}} 2^{-n}$.   \\
+
+\ifsolutions
+\color{blue}
+\begin{solution}
+This is simply the probability of getting $k$ heads and $(n-k)$ tails, and since both heads and tails have probability $\frac 1 2$, then we know that this is simply ${{n}\choose{k}} 2^{-n}$.  (There are $\binom n k$ ways to ``choose'' which $k$ of the $n$ coin flips come up heads.)
+\end{solution}
+\color{black}
+\else
+\vspace{0.5in}
+\fi
+
+\section{Randomized Algorithms}
+If we augment our models of computation to be able to toss coins we
+can design algorithms that can take advantage of randomness. In some
+cases, adding randomness has enabled the development of algorithms
+that are faster than known deterministic algorithms.
+
+When we analyze the performance of randomized algorithms, we typically
+analyze \emph{expected} performance, either in terms of the quality of
+the answer or in terms of runtime.
+
+As an example, consider the randomized max cut algorithm from the lecture
+notes:
+
+\begin{defn}[Max-Cut problem]
+  Given a graph $G = (V, E)$ find a cut $C \subset V$ that maximizes
+  the quantity:
+  \[\Big|\big\{(a, b) \in E \;|\; (a \in C \text{ and } b \not\in C) \text{ or } (a \not\in C \text{ and } b \in C)\big\}\Big|\]
+  that is, maximizes the number of edges that cross the cut.
+\end{defn}
+
+The lecture notes proposed a simple randomized algorithm for this
+problem:
+\begin{example}[Randomized Max-Cut]
+  Start with $C = \emptyset$. Then for each $v \in V$ set
+  $C \gets C \cup \{v\}$ with probability $\frac12$. In simpler terms,
+  for each vertex we flip a coin and if it is heads we add that vertex
+  to the cut.
+\end{example}
+
+Note that the runtime of this algorithm is $O(|V|)$ because for each
+vertex we only need to flip a coin to decide whether it is in the
+cut. Because the algorithm is randomized, to effectively discuss its
+performance we need to use the language of probability. As noted in
+the lecture notes, if $m = |E|$, the cut will have \emph{expected} size
+$m/2$. However, note that in theory the algorithm could fail and
+produce a cut with smaller size.
+
+Next, we work through the analysis of \textsc{WalkSAT} from the
+lecture notes. Recall that the 3SAT problem determines whether for a
+boolean expression of a specified format, there is an assignment of
+its variables that makes it evaluate to true (satisfies it).
+
+The format for 3SAT is an AND of clauses of ORs of three variables (or
+their negations). For example,
+\[ (x_1 \lor \lnot x_2 \lor x_3) \land (x_1 \lor x_2 \lor x_4)\]
+is in 3-CNF, as needed for 3SAT.
+
+One approach to solving 3SAT in a randomized way is just to try random
+assignments for all the variables. Also, even if our random assignment
+doesn't work, we can try to improve it. To avoid getting stuck after
+several tries on a particular random assignment, we will ``give up''
+and pick a new starting random assignment. After enough rounds of
+this, we can give up on the whole thing and decide that the boolean
+expression is unsatisfiable.
+
+\begin{defn}[\textsc{WalkSAT}]
+  We write this process out in more detail. Let $\varphi$ be the
+  boolean expression provided to the algorithm and let $n$ be the
+  number of variables in $\varphi$.
+
+  \begin{algorithmic}
+    \For{$T$ steps}
+    \State Choose $x \gets \{0,1\}^n$ uniformly at random
+    \For{$S$ steps}
+    \If{$\varphi(x) = 1$}
+    \State \Return $x$
+    \EndIf
+    \State Choose random clause $(x_i, x_j, x_k)$ not satisfied
+    \State Choose random literal from $x_\ell \gets \{x_i, x_j, x_k\}$
+    \State Modify $x$ to satisfy $x_\ell$ (flip the bit)
+    \EndFor
+    \EndFor
+    \State \Return \texttt{Unsatisfiable}
+  \end{algorithmic}
+
+  In the lecture notes we saw that setting $T = 100 \cdot 3^{n/2}$ and
+  $S = n/2$ got us reasonably good performance.
+\end{defn}
+
+Clearly, if $\varphi$ is not satisfiable \textsc{WalkSAT} will never
+find a satisfying solution and we will correctly return
+\texttt{Unsatisfiable}. What is the probability that we will fail for
+$\varphi$ that \emph{is} satisfiable? That is, what is the probability
+that \textsc{WalkSAT} will return \texttt{Unsatisfiable} even though
+$\varphi$ is satisfiable?
+
+For this proof we want to determine the probability of finding a
+satisfying assignment during the inner for loop (where we improve
+$x$). What is the probability that for random $x$ we will walk our way
+to a satisfying assignment? Then, with this, we figure out the
+probability that during the $T$ iterations of the outer loop we will fail each
+time to find a satisfying assignment.
+
+\begin{example}[Proof of Performance]
+  More specifically, let $\Delta(x, x')$ be the number of bit
+  positions at which $x$ and $x'$ differ. For example,
+  \[ \Delta(111, 001) = 2 \qquad\text{and} \qquad \Delta(101, 010) = 3.\]
+
+  Then let $x^*$ be a satisfying assignment for $\varphi$. At each of
+  the inner loop iterations we show that we decrease $\Delta$ by one
+  with probability at least $\frac13$.
+
+  Therefore if $\Delta(x^*, x) \leq n/2$ with probability at least
+  $(1/3)^{n/2}$ we will randomly walk from $x$ to $x^*$. This
+  probability bound comes from the fact that one way to go from
+  $x \to x^*$ is to make the ``right'' decisions at each random
+  improvement step.
+
+  The probability of succeeding during any one inner loop is very
+  low. This is why we run the outer loop many ($T$) times. This is an
+  example of \emph{amplification}, where we increase our overall
+  probability of success by repeating some randomized process many
+  times.
+\end{example}
+
+Next, we walk through the several lemmas needed for the proof.
+
+\begin{exercise}[Probability of Improvement]
+  Show that at each improvement step, the probability of decreasing
+  $\Delta(x, x^*)$ is at least $1/3$.
+\end{exercise}
+
+\ifsolutions
+\color{blue}
+\begin{solution}
+  On each unsatisfied clause, $x$ and $x^*$ must differ in at least
+  one position (at least one of the variables in that clause must be
+  ``wrong''). Therefore, the probability of \textsc{WalkSAT} choosing
+  this variable to flip is $1/3$ because there are three variables in
+  the clause chosen uniformly at random.
+\end{solution}
+\color{black}
+\else
+\vspace{1.25in}
+\fi
+
+This shows that starting from $\Delta(x, x^*) \leq n/2$ and taking
+$n/2$ steps we will walk to a satisfying solution with probability at
+least $(1/3)^{n/2} = \sqrt{3}^{\;-n}$. However, this requires that
+$\Delta(x, x^*) \leq n/2$. What is the probability of that?
+
+\begin{exercise}
+  What is the probability that $\Delta(x, x^*) \leq n/2$?
+\end{exercise}
+
+\ifsolutions
+\color{blue}
+\begin{solution}
+  This probability is at least $1/2$. The lecture notes give a quick
+  proof of this: Let
+  \begin{align*}
+    A &= \{y \in \{0, 1\}^n \;|\; \Delta(y, x^*) \leq 1/2\} \subset
+        \{0,1\}^n\\
+    B &= \{y \in \{0, 1\}^n \;|\; \Delta(y, x^*) > 1/2\} = \{0,1\}^n \setminus A
+  \end{align*}
+
+  Consider the map
+  $\operatorname{FLIP}(x_0,\;\ldots,\;x_{n-1}) =
+  (1-x_0,\;\ldots,\;1-x_{n-1})$ that flips each input bit that it is
+  given. This map is one-to-one because
+  $\operatorname{FLIP}(\operatorname{FLIP}(x)) = x$.
+
+  Notice that
+  $\Delta(x, x^*) = k \implies \Delta(\operatorname{FLIP}(x), x^*) =
+  n-k$. If $x$ and $x^*$ disagree in $k$ places, then when we flip all
+  the bits in $x$ they will disagree in the $n-k$ places they agreed
+  before, and will now agree in the $k$ places where they formerly disagreed.
+
+  Next, note that for $b \in B$, $\operatorname{FLIP}(b) \in
+  A$. Because $\operatorname{FLIP}$ is one-to-one, we have
+  $|B| \leq |A|$. Therefore, the probability is at least $1/2$ because
+  at worst $|A| = |B|$ so that we have a $1/2$ chance of
+  $\Delta \leq n/2$.
+
+  For students who have taken/are taking Stat110, note that one way to
+  generate a random bit string $x$ is to start with $x^*$ and flip a
+  coin for each bit to choose whether to flip it. Then, you can see
+  that $\Delta(x, x^*)$ is a random variable with binomial
+  distribution with parameters $n$ and $1/2$. Because the binomial
+  coefficient is symmetric:
+  \[ \mathbb{P}_x(\Delta(x, x^*) \leq n/2) = \sum_{k=0}^{n/2}
+    \binom{n}{k}\frac12^n \geq 1/2\]
+  The value $n/2$ is also the median of this binomial distibution.
+\end{solution}
+\color{black}
+\else
+\vspace{2.5in}
+\fi
+
+\begin{exercise}[Putting it Together]
+  What is the probability that a single iteration of the inner loops
+  succeeds in finding a satisfying assignment? What is our overall
+  probability of \emph{failure} after all $S \cdot T$ iterations of
+  both loops?
+\end{exercise}
+
+\ifsolutions
+\color{blue}
+\begin{solution}
+  From our work above we know that with probability at least $1/2$ we
+  will start with a ``pretty good'' value for $x$, and that we have a
+  $\sqrt{3}^{\;-n}$ probability of walking from there to a satisfying
+  assignment. Therefore, during a single iteration of the inner loop,
+  we have a probability of \emph{at least}
+  \[ \frac12 \cdot \sqrt{3}^{\;-n}\]
+  of finding a satisfying assignment.
+
+  In order for the full algorithm to fail it will have to fail during
+  each of the $T = 100 \cdot 3^{n/2}$ iterations of the outer loop. This probability
+  is:
+  \[ \left(1 - \frac12 \cdot \sqrt{3}^{\;-n}\right)^{100 \cdot
+      3^{n/2}}\]
+  We can use the fact that $(1-1/n)^n \leq \frac1e$ so our probability of
+  \emph{failure} is:
+  \[ \left(1 - \frac12 \cdot \sqrt{3}^{\;-n}\right)^{100 \cdot
+      3^{n/2}} = \left(1 - 2^{-1} \cdot 3^{-n/2}\right)^{2 \cdot
+      3^{n-2} \cdot 50} \leq (1/e)^{50} \approx 1.93 \times 10^{-22}\]
+\end{solution}
+\color{black}
+\else
+\vspace{2in}
+\fi
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

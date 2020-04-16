@@ -1,0 +1,121 @@
+\documentclass[10pt]{article}
+\usepackage{amsmath,amssymb, color}
+\usepackage[margin=.6in]{geometry}
+\usepackage[basic]{complexity}
+\newcommand{\handout}[5]{
+  \noindent
+  \begin{center}
+  \framebox{
+    \vbox{
+      \hbox to 5.78in { {\bf CS 121: Introduction to Theoretical Computer Science} \hfill #2 }
+      \vspace{4mm}
+      \hbox to 5.78in { {\Large \hfill #5  \hfill} }
+      \vspace{2mm}
+      \hbox to 5.78in { {\small\em #3 \hfill #4} }
+    }
+  }
+  \end{center}
+  \vspace*{4mm}
+}
+
+\newcommand{\lecture}[4]{\handout{#1}{#2}{#3}{#4}{Section #1}}
+
+\newcommand{\Verify}{\mathit{Verify}}
+\newcommand{\NAND}{\mathit{NAND}}
+\newcommand{\pred}{\leq_\text{p}}
+\newcommand{\Line}{\vspace{.3cm}\hrule\vspace{.3cm}}
+\newcommand{\TSAT}{3\mathit{SAT}}
+\begin{document}
+% Change these parameters accordingly!
+\newcommand{\sectionnumber}{8}
+\newcommand{\thedate}{}
+\newcommand{\tfnames}{}
+\newcommand{\bin}{\{0,1\}}
+\newcommand{\CLIQUE}{\mathit{CLIQUE}}
+\newcommand{\TAUT}{\mathit{TAUTOLOGY}}
+\lecture{\sectionnumber}{Fall 2019}{Prof. Boaz Barak}{\tfnames}
+\subsection{Problems}
+\begin{enumerate}
+\item Give a simple argument for why $\NP\subseteq\EXP$ --- consider how you can use the existence of the verifier $G$.
+
+\item For each of the following, say whether the problem is in $\P$, $\NP$, is undecidable, or whether we don't know.
+
+\begin{enumerate}
+\item Given an integer $x$, determine if $x$ has a prime factor that is at most $k$.
+
+\item Given an undirected graph graph, determine whether it is possible to partition its vertices into two sets, with at least $k$ edges crossing between sets.
+
+\item Given a program $Q$, an input $x$, and a string $1^t$, determine whether $Q$ halts on $x$ within $t$ steps.
+
+\end{enumerate}
+
+
+\item Define $F \in \coNP$ iff $\overline{F} \in \NP$, where $\overline{F}$ denotes the negation of the output of $F$ (for example, if $F(00)=1$, then $\overline{F}(00)=0$). Prove that if $\P=\NP$, then $\coNP=\NP$.
+
+\item Let $V:\bin^* \to \bin$ be defined as taking two inputs $x,w$ such that there exists $a,b\in \mathbb{N}$ such that $w\in \bin^{a|x|^b}$. $V\in P$. Prove that $V\in TIME(|x|^c)$ for some $c$.
+
+\end{enumerate}
+
+\Line
+\textbf{Solution 1:} For every possible certificate $w$, we can check whether $G(x,w)=1$. We need to try all possible $w$ of length $an^b$ (there are $2^{an^b}$ of these), and evaluating $G$ can be done in polynomial time, so we make take most an exponential number of steps.
+\par
+
+\textbf{Solution 2:} (a) in $\NP$ (the certificate is a prime factor that is at most $k$) (b) in $\NP$ (the certificate is the partition) (c) in $\P$ (just stimulate the program).
+
+\par
+
+\textbf{Solution 3:} For every $F \in \NP$, we have a $NAND-TM$ program $W$  which computes $F$ in polynomial time. Thus $\overline{W}$ ($W$ which negates its output) computes $\overline{F}$ in polynomial time. Since this holds for every $F \in \NP$, we have $\coNP \subset \P = \NP$. But $P \subset \coNP$, so we have equality.
+
+\textbf{Solution 4:} Since $V\in P$ there exists some $c$ such that $V\in TIME(n^c)$. We can rewrite this as $V\in TIME((|x| + a|x|^b)^c)$. $(|x| + a|x|^b)^c$ is polynomial in $|x|$, so in particular, there exists some $c'$ such that for large enough $|x|$, $(|x| + a|x|^b)^c \leq |x|^{c'}$, so $V\in TIME(|x|^{x'})$.
+
+\Line
+\subsection{Problems}
+\begin{enumerate}
+\item Given an undirected graph $G=(V,E)$, a clique is a subset $C \subseteq V$ such that $(v_1,v_2) \in E$ for all $v_1,v_2 \in C$. Consider the function $\CLIQUE(G,k)=1$ iff $G$ has a clique of size $k$, and $0$ otherwise. Show that $\TSAT \pred \CLIQUE$, and that $\CLIQUE$ is $\NP$-complete.
+
+
+\item Define $F \in \coNP$ iff $\overline{F} \in \NP$, where $\overline{F}$ denotes the negation of the output of $F$ (for example, if $F(00)=1$, then $\overline{F}(00)=0$). Consider the following function $\TAUT$: if $\phi$ is a 3DNF formula (clauses of three `and'ed variables, `or'ed together), $\TAUT(\phi)=1$ iff for all assignments $x$ of the variables of $\phi$, we have $\phi(x)=1$. Otherwise $\TAUT(\phi)=0$. Prove that $\TAUT$ is $\coNP$-complete.
+
+We say $\TAUT$ is $\coNP$complete if $\TAUT \in \coNP$ and $\forall F\in \coNP, \TAUT\leq_p F$. Hint: $\TSAT$ is $\NP$-complete. Try to relate the $\TSAT$ problem to $\TAUT$.
+
+\item Given $n$ sets $S_1, S_2, \ldots, S_n$ such that $$\bigcup_{i=1}^{n} S_i = A$$ the set cover of size $k$ over these sets is a collection $C$ of $k$ of these sets such that $$\bigcup_{i \in C} S_i = A$$ Given a collection of sets and an integer $k$, SET-COVER returns if there exists a valid set cover of a most size $k$ over the given collection of sets. Prove that SET-COVER is $\NP$-complete.
+
+
+\end{enumerate}
+\Line
+\textbf{Solution 1:} Suppose we're given a $\TSAT$ formula $\varphi=\varphi_1 \land \dots\land \varphi_l$, where each $\varphi_i$ is a clause. We construct a graph $G$ as follows: for every clause $c$ and variable $v$ in $c$, we create a vertex $(c,v)$ (so we end up with $3l$ clauses). For example, if clause $1$ is $(x_1 \lor \lnot x_2 \lor x_3)$, we create the vertices $(1,x_1)$, $(1,\lnot x_2)$ and $(1, x_3)$. For every two vertices $(c,v),(c',v')$, we add an edge between these two vertices iff $c \neq c'$ and $v$ is not the negation of $v'$. Clearly we can do all of these steps in polynomial time. We claim that $\CLIQUE(G,l)=1$ iff $\varphi$ is satisfiable.\par
+
+First suppose that $\varphi$ is satisfiable with assignment $x$. Construct a clique $C$ as follows: for each clause $\varphi_i$, look for a variable which is set to $1$ via the assignment $x$, and add $(i,v)$ to $C$. For example, if our clause is $\varphi_1=x_1 \lor \lnot x_2 \lor x_3$, and $x=000$, we can add the vertex $(1,\lnot x_2)$. Clearly $|C|=l$. Moreover, $C$ is a clique, because there is only not an edge between $(c,v),(c',v')$ if $c=c'$ or $v$ is the negation of $v'$. The first case cannot happen by construction. The second case cannot happen because if $v$ evaluates to $1$, then $\lnot v$ cannot also evaluate to $1$.\par
+
+For the other direction, suppose we have a clique $C$ of size $l$. Then our clique is of the form $(1,v_1),(2,v_2),\dots,(l,v_l)$. We create an assignment $x$ which satisfies $\varphi$ by setting $x$ such that each $v_i$ evaluates to $1$. For example, if $v_1=x_5$, we set $x_5=1$, and if $v_2=\lnot x_3$, we set $x_3$ to $0$. Notice that we will never be in the case where we set $x_j$ to both $1$ and $0$; this would imply that we have edges $(c,v)$, $(c',v')$ $\in C$ such that $v = \lnot v'$, which contradicts our construction of $G$. Moreover, $x$ constructed in this way satisfies $\varphi$, because for each $i$, $\varphi_i$ evaluates to $1$, because at least one variable in clause $i$ evaluates to $1$.\par
+
+Lastly, notice that $\CLIQUE$ is in $\NP$, because we can always ``guess" a clique of size $k$ and determine whether this guess is indeed a clique in polynomial time (just check all possible pairs of edges).
+
+\textbf{Solution 2:} We will prove that $TAUTOLOGY$ is $coNP$-complete by proving that for any $F\in coNP$, $F \leq_p \TAUT$. Let $F \in \coNP$. Then $\overline{F} \in \NP$, so for every $x \in \{0,1\}^{*}$ we can in polynomial time compute a $\TSAT$ formula $\phi_{x}$ for $\overline{F}$ such that $\overline{F}(x)=1$ iff $\phi_{x}$ has a satisfying assignment (i.e. there exists an $x'$ such that $\phi_{x}(x')=1$). But this means that $F(x)=1$ iff $\phi_{x}$ has no satisfying assignment, i.e. $\overline{F}(x)=1$ iff $\overline\phi_{x}$ is equal to $1$ for every assignment of variables. But $\overline{\phi_x}$ is a $3DNF$, so this is exactly the problem $\TAUT$.
+$$\TAUT(\overline{\phi_x}) = F(x)$$
+Thus we have given a reduction $F \pred \TAUT$.
+
+Now we show that $\TAUT\in \coNP$. Let $G(x)$ be a function taking in $x$, a 3DNF, that returns $1$ if there exists a non-satisfying solution for $x$. We see this is in NP, because the solution is a binary string and the verifier just runs through the clauses, checking them in linear time. We see that $\overline{G}(x) = \TAUT(x)$ exactly because there being no non-satisfying solutions is exactly the condition for every solution satisfying. Thus $\TAUT$ is $\coNP$-complete.
+
+\textbf{Solution 3:} We know that $SET-COVER$ is in $\mathsf{NP}$ because we can use a set of sets as the certificate, and can verify by checking that each element is a member of at least one set.
+
+We now reduce from $VERTEXCOVER$. Suppose we have an instance of $VERTEXCOVER$ (so a graph and a number $k$). Label the edges in the graph from $1$ to $m$. For each vertex $v$ create a set $S_v$ that is composed of the edges of which $v$ is a part. This transformation is polynomial time since it must run over the edges and then runs over the vertices (going over each edge twice more).
+
+First suppose that there is a valid $VERTEXCOVER$. I claim that the sets associated with the vertices in the $VERTEXCOVER$ (call these vertices $V'$) form a valid $SET-COVER$. For any number associated with an edge $e = (u,v)$, either $u\in V'$ or $v\in V'$, which implies the number associated with $e$ is either in $S_u$ or $S_v$.
+
+Now suppose there is a valid $SET-COVER$ of size $k$. I claim the vertices associated with the sets in this $SET-COVER$ (denote this set of vertices $V'$) form a $VERTEXCOVER$. Suppose towards a contradiction there was an edge $(u,v)\in E$ such that $u,v\notin V'$. This implies the number associated with that edge would not be in the $SET-COVER$, so it would not be a $SET-COVER$, hence a contradictoin.
+
+\Line
+\subsection{Problems}
+\begin{enumerate}
+    \item Prove that for $V\in P$ $STARTSWITH_V$ is in $NP$.
+    \item Using the optimization and search-to-decision results, prove that for any $F\in P$, we can compute $OPTARG(x,1^m) = \text{argmax}_{y\in \bin^m} F(x,y)$ (again identifying the output of $F$ with a natural number via the binary representation).
+\end{enumerate}
+
+\Line
+
+\textbf{Solution 1:} The certificate is the remaining $a|x|^b-l$ bits. The verifier is exactly $V$.
+
+\textbf{Solution 2:} By the optimization result, we know that given $F\in P$ we can compute $OPT(x,1^m) = \max_{y\in \bin^m}F(x,y)$ in polynomial time. Let $k_{x,m}$ denote $OPT(x,1^m)$. Then we see we can compute the function $G(x,y)$ which returns $1$ if and only if $F(x,y) = k_{x,m}$ in polynomial time (because $F\in P$). Applying the search to decision on result on the polynomial time algorithm for $G$ thus yields a solution $y$ such that $F(x,y) = k_{x,m}$.
+
+\end{document}

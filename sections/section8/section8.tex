@@ -1,0 +1,135 @@
+\documentclass[10pt]{article}
+\usepackage{amsmath,amssymb, color}
+\usepackage[margin=.6in]{geometry}
+\usepackage[basic]{complexity}
+\newcommand{\handout}[5]{
+  \noindent
+  \begin{center}
+  \framebox{
+    \vbox{
+      \hbox to 5.78in { {\bf CS 121: Introduction to Theoretical Computer Science} \hfill #2 }
+      \vspace{4mm}
+      \hbox to 5.78in { {\Large \hfill #5  \hfill} }
+      \vspace{2mm}
+      \hbox to 5.78in { {\small\em #3 \hfill #4} }
+    }
+  }
+  \end{center}
+  \vspace*{4mm}
+}
+
+\newcommand{\lecture}[4]{\handout{#1}{#2}{#3}{#4}{Section #1}}
+
+\newcommand{\Verify}{\mathit{Verify}}
+\newcommand{\NAND}{\mathit{NAND}}
+\newcommand{\pred}{\leq_\text{p}}
+\newcommand{\Line}{\vspace{.3cm}\hrule\vspace{.3cm}}
+\newcommand{\TSAT}{3\mathit{SAT}}
+\begin{document}
+% Change these parameters accordingly!
+\newcommand{\sectionnumber}{8}
+\newcommand{\thedate}{}
+\newcommand{\tfnames}{}
+\newcommand{\bin}{\{0,1\}}
+\newcommand{\CLIQUE}{\mathit{CLIQUE}}
+\newcommand{\TAUT}{\mathit{TAUTOLOGY}}
+\lecture{\sectionnumber}{Fall 2019}{Prof. Boaz Barak}{\tfnames}
+\section{A brief review of the classes $\P$ and $\EXP$}
+Remember that the class of functions $\P$ is defined as \[\P\equiv\bigcup_{c\in\mathbb N}\TIME\left(n^c\right).\] In other words, a function $F:\bin^*\to\bin$ is in $\P$ if it can be computed in polynomial time by a reasonable computational model (RAM machine, Turing machine, $NAND-TM$). The class $\EXP$ is defined as \[\EXP\equiv \bigcup_{c\in\mathbb N} \TIME\left(2^{n^c}\right),\] meaning that a function is in $\EXP$ if it can be computed in exponential time in the size of its input.\\
+
+{\textbf{N.B.} Note that our definitions of both $\P$ and $\EXP$ treats $n$ as the size of the input. For complexity analysis, you must be clear about what $n$ is -- for example, stating that a graph algorithm is $O(n)$ with respect to the number of vertices is not the same as saying that it is $O(n)$ with respect to the number of bits that the algorithm takes as input.}
+
+\section{The class $\NP$}
+\subsection{Getting familiar with $\NP$}
+The class $P$ tells us ``which functions are efficiently solvable." Similarly, we may want to give a definition of functions that we can ``check efficiently." This is what $\NP$ gives us.
+
+Recall the definition of $\NP$: a function $F:\bin^*\to\bin$ is in $\NP$ if $\exists a,b\in\mathbb{N}$ and $V:\bin^*\to\bin$ such that $V\in\P$ and
+\[\forall x\in\bin^n, F(x)=1\iff\exists_{w\in\bin^{an^b}}\text{ such that }V(x,w)=1.\]
+What is the intuition behind this construction? Since the definition of $F$ is from $\bin^*$ to $\bin$, we can think of $F(x)$ as evaluating binary questions. In this case $w$ can be thought of as an example that the answer to the question we are asking is `yes', and $V$ is the ``verifier" of these examples (since it runs in polynomial time, we say it's efficient). In the function $\TSAT$, which maps 3CNF (conjunctive normal form) formulas to a single bit indicating whether or not they are satisfiable, is in $\NP$ because if a given boolean formula $\varphi$ is in $\TSAT$, we can provide a string $w$ that is a satisfying assignment of the variables in $\varphi$, and $V$ can efficiently check that $\varphi$ is indeed satisfied. Similarly, the problem of telling whether there is a clique of size $k$ in a given undirected graph is in $\NP$ because for any size $k$ and graph $G$, we can give a $w$ which is a clique of size $k$ in graph $G$; the verifier $V$ can then check the existence of all the requisite $\binom k2$ edges.\\
+
+How does the $\Leftrightarrow$ fit into this? The $\Rightarrow$ says that if $F(x)=1$, so the answer to the original question is ``yes", then there must be a satisfying example $w$, and our verifier should successfully verify this example, yielding $V(x,w)=1$. In the other direction, this is saying that if there is a $w$ such that $V(x,w)=1$ (so in english, there is a satisfying example for $x$), then it must be true that the answer to the original question $F(x)=1$. This just means our verifier shouldn't find satisfying examples for problems that are actually not solvable!\\
+
+There is one last detail to be aware of in this definition. We see that $w\in \{0,1\}^{an^b}$. This seems like a random detail, but definitions should not seem random. Whenever you see something like this that seems odd in a definition, you should ask yourself why this is. $w\in \{0,1\}^{an^b}$ means that our satisfying example should not be ``too much longer than $x$." This is important because we are trying to have our verifier $V$ be efficient, but all we enforced upon it is that $V\in P$. If $|w| = 2^n$ and our verifier takes linear time, then our verifier will actually take time exponential to $|x|$, which isn't really a reasonable definition of efficiency. One of the practice problems is proving thata $V$ is efficient with respect to the length of $x$.
+
+From our definition of $\NP$ it should be clear that $\P\subseteq \NP$. After all, if a function $F$ is computable in polynomial time, we can take $V$, our verifier, to disregard $w$ and simply run $F$ on its input. Then $V$ will still run in polytime, as desired. The (literal) million dollar question is whether $\P=\NP$. It is strongly suspected (but not proven) that \[P\overset{?}\subsetneq \NP\] --- that there are problems in $\NP$ that cannot be solved in polytime.\\
+
+{\textbf{A brief note:} $\NP$ does not stand for `not polynomial' time! Rather it stands for nondeterministic polynomial time. This is because a nondeterministic Turing machine (or other computational model) can compute all functions in $\NP$ in polynomial time. It does this by `guessing' a certificate, and then verifying the input with the certificate, which by definition takes polynomial time. So we see that this definition of $\NP$ is equivalent to the one above.}\\
+
+\Line
+\subsection{Problems}
+\begin{enumerate}
+\item Give a simple argument for why $\NP\subseteq\EXP$ --- consider how you can use the existence of the verifier $G$.
+
+\item For each of the following, say whether the problem is in $\P$, $\NP$, is undecidable, or whether we don't know.
+
+\begin{enumerate}
+\item Given an integer $x$, determine if $x$ has a prime factor that is at most $k$.
+
+\item Given an undirected graph graph, determine whether it is possible to partition its vertices into two sets, with at least $k$ edges crossing between sets.
+
+\item Given a program $Q$, an input $x$, and a string $1^t$, determine whether $Q$ halts on $x$ within $t$ steps.
+
+\end{enumerate}
+
+
+\item Define $F \in \coNP$ iff $\overline{F} \in \NP$, where $\overline{F}$ denotes the negation of the output of $F$ (for example, if $F(00)=1$, then $\overline{F}(00)=0$). Prove that if $\P=\NP$, then $\coNP=\NP$.
+
+\item Let $V:\bin^* \to \bin$ be defined as taking two inputs $x,w$ such that there exists $a,b\in \mathbb{N}$ such that $w\in \bin^{a|x|^b}$. $V\in P$. Prove that $V\in TIME(|x|^c)$ for some $c$.
+
+\end{enumerate}
+
+\Line
+\section{Universality and $\TSAT$ --- The Cook-Levin Theorem}
+The Cook-Levin Theorem states that \[\forall F\in\NP, F\leq_\text{p}\TSAT.\] This is a very important result! It says that $\TSAT$ is at least as hard as every problem in $\NP$, or that solving $\TSAT$ in polytime would allow us to solve any $\NP$ problem in polytime as well. This means that $\TSAT$ is $\NP$-hard.\\
+
+Definition: $G:\bin^*\to\bin$ is $\NP$-hard if $\forall F\in \NP$, $F\leq_p G$. A function $H:\bin^*\to\bin$ is $\NP$-complete if it is $\NP$-hard and itself in $\NP$.\\
+
+Therefore, from what we saw previously, $\TSAT$ is also $\NP$-complete (this is one way of stating the Cook-Levin Theorem).
+
+\subsection{Polynomial-Time Reductions}
+
+Recall that a function $F$ is polynomially reducible to a function $G$ is a polynomial-time algorithm for computing $F$ that makes use of $G$. We write that $F\leq_\text{p} G$. Reductions as such are helpful because they impliy that $F$ is a problem that is ``no harder'' than $G$ -- because we know that there exists at least one way of computing $F$, which is to make use of $G$. To show that a problem $G$ is $\NP$-hard, it suffices to reduce a known $\NP$-hard problem $F$ to $G$, since solving $G$ (in an efficient manner) implies that we can solve $F$ too.\\
+
+\Line
+\subsection{Problems}
+\begin{enumerate}
+\item Given an undirected graph $G=(V,E)$, a clique is a subset $C \subseteq V$ such that $(v_1,v_2) \in E$ for all $v_1,v_2 \in C$. Consider the function $\CLIQUE(G,k)=1$ iff $G$ has a clique of size $k$, and $0$ otherwise. Show that $\TSAT \pred \CLIQUE$, and that $\CLIQUE$ is $\NP$-complete.
+
+
+\item Define $F \in \coNP$ iff $\overline{F} \in \NP$, where $\overline{F}$ denotes the negation of the output of $F$ (for example, if $F(00)=1$, then $\overline{F}(00)=0$). Consider the following function $\TAUT$: if $\phi$ is a 3DNF formula (clauses of three `and'ed variables, `or'ed together), $\TAUT(\phi)=1$ iff for all assignments $x$ of the variables of $\phi$, we have $\phi(x)=1$. Otherwise $\TAUT(\phi)=0$. Prove that $\TAUT$ is $\coNP$-complete.
+
+We say $\TAUT$ is $\coNP$complete if $\TAUT \in \coNP$ and $\forall F\in \coNP, F\leq_p \TAUT$. Hint: $\TSAT$ is $\NP$-complete. Try to relate the $\TSAT$ problem to $\TAUT$.
+
+\item Given $n$ sets $S_1, S_2, \ldots, S_n$ such that $$\bigcup_{i=1}^{n} S_i = A$$ the set cover of size $k$ over these sets is a collection $C$ of $k$ of these sets such that $$\bigcup_{i \in C} S_i = A$$ Given a collection of sets and an integer $k$, SET-COVER returns if there exists a valid set cover of a most size $k$ over the given collection of sets. Prove that SET-COVER is $\NP$-complete.
+
+
+\end{enumerate}
+\Line
+\section{What if $\mathsf{P}=\mathsf{NP}$?}
+
+Here we go through a few consequences if $\mathsf{P} = \mathsf{NP}$.
+\subsection{Search-to-Decision}
+When considering a problem--such as cliques of size $k$ in graph $G$--there are two relevant questions to ask. The first are decision problems, which ask if there is a solution. In this case, does there exist a clique of size $k$ in graph $G$? The second type of problem is a search problem. In this case, the question would be, find a clique of size $k$ in graph $G$ if it exists.
+
+An interesting results is that if $\mathsf{P}=\mathsf{NP}$ then search and decision problems become equally hard. That is, if we can solve a decision problem in polynomial time, we can solve the accompanying search problem in polynomial time too.
+
+More formally, if $\mathsf{P}=\mathsf{NP}$, then for every polynomial-time algorithm $V$ and $a,b \in \mathbb{N}$, there is a polynomial-time algorithm $FIND_V$ such that for every $x\in \bin^n$, if there exists $y\in \bin^{an^b}$ satisfying $V(xy)=1$, then $FIND_V(x)$ finds some string $y'$ satisfying this condition.
+
+As with most proofs in this course, understanding the idea of the proof is far more important than memorizing all the details. As such, we'll give a more intuition-based explanation of the proof. The key insight is that we can define a function $STARTSWITH_V$ that on input $x\in \bin^*$ and $z\in \bin^l$ is $1$ if and only if there exists a $y\in \bin^{a|x|^b}$ such that the first $l$ bits of $y$ are equal to $z$ and $V(xy)=1$. If $\mathsf{P}=\mathsf{NP}$ (we prove that this function is in $\mathsf{NP}$ in the practice problems), then we can search for the solution by asking if a solution exists starting with $0$ or $1$ (if neither are true then there is no solution), and dependent on that, pick one to add to our solution, and ask whether the next bit is a $0$ or $1$. This results in running a polynomial time algorithm a linear number of times, overall polynomial!
+
+\subsection{Optimization}
+
+Optimization (finding both max and argmax) for a polynomial time function also becomes polynomial time if $\mathsf{P} = \mathsf{NP}$.
+
+In more formal terms, if $\mathsf{P}=\mathsf{NP}$, then for every polynomial-time computable function $f:\bin^* \rightarrow \bin$ there is a polynomial-time algorithm $OPT$ such that on input $x\in \bin$, $OPT(x,1^m) = \max_{y\in \bin^m} f(x,y)$ (where we identify the output of $f(x)$ with a natural number via the binary representation).
+
+The general idea of the proof involves creating a function that tells us if the optimal value is above $k$ ($G(x,1^m,k) = \exists_{y\in \bin^m}F(x,y)\geq k$). We can show this is in NP, and then we can use this to do a binary search on the possible values of $k$. Since $F$ is polynomial, it can return a maximal value of $2^{p(n)}$, so a binary search takes $\log(2^{p(n)}) = p(n)$.
+
+\Line
+\subsection{Problems}
+\begin{enumerate}
+    \item Prove that for $V\in P$ $STARTSWITH_V$ is in $NP$.
+    \item Using the optimization and search-to-decision results, prove that for any $F\in P$, we can compute $OPTARG(x,1^m) = \text{argmax}_{y\in \bin^m} F(x,y)$ (again identifying the output of $F$ with a natural number via the binary representation).
+\end{enumerate}
+
+\end{document}
