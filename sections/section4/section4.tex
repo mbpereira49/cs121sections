@@ -198,9 +198,9 @@ As it turns out, we $\emph{can't}$ for some functions.
 \end{theorem}
 
 $\emph{Intuition.}$
-It is important to get the intuition here. There are infinitely many binary strings in $\{0, 1\}^*$, while there are
-finite number of strings in $\{ 0, 1\}^n$. And that's precisely what makes it impossible to compute some functions since
-NAND-TM programs are finite objects.
+It is important to get the intuition here. Part of the difficulty of expanding the domain of functions from $\{0,1\}^n$ to $\{0,1\}^*$ is that there are only finitely many strings of $n$ bits but infinitely many of arbitary length. This difference explains why we cannot apply the same approach to computing every function that we used with functions on $\{0,1\}^n$, which relied on enumerating the finite set of outputs. 
+
+However, there is another distinction which suggests why there are some functions we cannot compute: NAND-TM consists of objects with finite descriptions, while functions $\{0,1\}^* \to \{0,1\}$ have infinitely long description lengths. We can imagine a NAND-TM program as a compressed representation of the functions with ``nice patterns'', but the number of possible functions is so large that it overwhelms the ability of a finitely-described NAND-TM program to capture all of them.
 
 \subsection{Proof:}
 
@@ -258,6 +258,9 @@ no NAND-TM program can simulate $F_{impossible}$.
 \subsection{Exercise}
 Consider the set $P(\mathbb{N})$ of all subsets of $\mathbb{N}$. Show that there is no one-to-one and onto function between 
 $\mathbb{N}$ and $P(\mathbb{N})$. 
+
+\subsection{Exercise}
+Is the set of NAND-TM programs countable? What about the set of functions $\{0,1\}^* \to \{0,1\}$? How can we get an alternate proof of Theorem 1 using these facts?
 
 \section{Reduction}
 In the preceding section, we showed that there is some function from $\{0, 1\}^*$ to $\{0, 1\}$ that can't be simulated by
